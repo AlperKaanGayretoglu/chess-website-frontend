@@ -13,6 +13,7 @@ import {
 	Title,
 } from "../styles/layouts/Authentication/Authentication.style";
 import {
+	emailValidation,
 	passwordValidation,
 	usernameValidation,
 } from "../utils/authenticationValidation";
@@ -20,8 +21,9 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { login } from "../services/userApi";
+import { register } from "../services/userApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
+import MailInput from "../styles/components/Input/MailInput";
 import PasswordInput from "../styles/components/Input/PasswordInput";
 import TextInput from "../styles/components/Input/TextInput";
 import { TextLink } from "../styles/components/Link/TextLink";
@@ -29,35 +31,41 @@ import General from "../styles/layouts/General/General";
 import { redirectUser } from "../utils/checkUser";
 import { promiseToast } from "../utils/promiseToast";
 
-export type LoginForm = {
+export type RegisterForm = {
 	username: string;
+	email: string;
 	password: string;
 };
 
-const Login = () => {
+const Register = () => {
 	const router = useRouter();
 
 	const {
 		handleSubmit,
 		formState: { errors },
 		control,
-	} = useForm<LoginForm>({
+	} = useForm<RegisterForm>({
 		resolver: yupResolver(
 			yup.object({
 				username: usernameValidation,
+				email: emailValidation,
 				password: passwordValidation,
 			})
 		),
 		reValidateMode: "onSubmit",
 	});
 
-	const signinWithCredentials: SubmitHandler<FieldValues> = async (form) => {
-		if (form.username && form.password) {
+	const registerWithCredentials: SubmitHandler<FieldValues> = async (form) => {
+		if (form.username && form.email && form.password) {
 			const res = await promiseToast(
-				login({ username: form.username, password: form.password }),
+				register({
+					username: form.username,
+					email: form.email,
+					password: form.password,
+				}),
 				"register_login_logout_toast_id",
-				"Login Successful",
-				"Login Failed"
+				"Register Successful",
+				"Register Failed"
 			);
 
 			if (res && res.token) {
@@ -70,10 +78,10 @@ const Login = () => {
 		<General>
 			<AuthenticationBase>
 				<AuthenticationContainer>
-					<Title>Login</Title>
+					<Title>Register</Title>
 					<Form
-						id="chess_website_login_form"
-						onSubmit={handleSubmit(signinWithCredentials)}
+						id="chess_website_register_form"
+						onSubmit={handleSubmit(registerWithCredentials)}
 					>
 						<Controller
 							name={"username"}
@@ -85,6 +93,20 @@ const Login = () => {
 									label={"Username"}
 									error={Boolean(errors.username)}
 									helperText={errors.username?.message}
+									{...field}
+								/>
+							)}
+						/>
+						<Controller
+							name={"email"}
+							defaultValue=""
+							control={control}
+							rules={{ required: true }}
+							render={({ field }) => (
+								<MailInput
+									label={"E-mail"}
+									error={Boolean(errors.email)}
+									helperText={errors.email?.message}
 									{...field}
 								/>
 							)}
@@ -103,8 +125,8 @@ const Login = () => {
 								/>
 							)}
 						/>
-						<PrimaryButton type="submit">Login</PrimaryButton>
-						<TextLink href="/register">Not yet have an account?</TextLink>
+						<PrimaryButton type="submit">Register</PrimaryButton>
+						<TextLink href="/login">Already have an account?</TextLink>
 					</Form>
 				</AuthenticationContainer>
 			</AuthenticationBase>
@@ -112,7 +134,7 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export default Register;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	return redirectUser(ctx) ?? { props: {} };

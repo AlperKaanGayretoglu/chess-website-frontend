@@ -20,7 +20,7 @@ const Header = () => {
 		if (
 			promiseToast(
 				logout(),
-				"login_logout_toast_id",
+				"register_login_logout_toast_id",
 				"Logout Successful",
 				"Logout Failed"
 			)

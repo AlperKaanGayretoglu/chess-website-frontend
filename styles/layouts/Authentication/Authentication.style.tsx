@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 
-export const LoginBase = styled.div`
+export const AuthenticationBase = styled.div`
 	width: 100%;
 `;
 
-export const LoginContainer = styled.div`
+export const AuthenticationContainer = styled.div`
 	width: 80%;
 	height: 100%;
 	max-width: 1440px;

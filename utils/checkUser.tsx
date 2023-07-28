@@ -12,7 +12,9 @@ export const checkIsLoggedIn = () => {
 };
 
 export const redirectUser = (ctx: GetServerSidePropsContext) => {
-	const isInLoginPage = ctx.resolvedUrl?.includes("/login");
+	const isInLoginPage =
+		ctx.resolvedUrl?.includes("/login") ||
+		ctx.resolvedUrl?.includes("/register");
 	const isAdmin = checkIsAdmin(ctx);
 	const token = getCookie(COOKIE_NAMES.token, ctx);
 
@@ -42,7 +44,7 @@ export const redirectUser = (ctx: GetServerSidePropsContext) => {
 		return {
 			redirect: {
 				permanent: false,
-				destination: "/login",
+				destination: "/register",
 			},
 		};
 	}
