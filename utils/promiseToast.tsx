@@ -11,31 +11,15 @@ export async function promiseToast(
 
 		const res = await promise;
 
-		if (!res) {
+		if (!res || !res.message) {
 			toast.success(default_success_message, { id: toast_id });
-			return;
+			return res;
 		}
 
-		if (res.errorCode || res.stack) {
-			let message = res.message;
-
-			if (!message) {
-				message = default_error_message;
-			}
-
-			toast.error(message, { id: toast_id });
-		} else {
-			let message = res.message;
-
-			if (!message) {
-				message = default_success_message;
-			}
-
-			toast.success(message, { id: toast_id });
-		}
-
+		toast.error(res.message, { id: toast_id });
 		return res;
 	} catch (error) {
 		toast.error(default_error_message, { id: toast_id });
+		return error;
 	}
 }
