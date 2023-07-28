@@ -2,8 +2,16 @@ import { deleteCookie, setCookie } from 'cookies-next';
 import { API_ENDPOINTS, COOKIE_NAMES } from '../data/constants';
 import sendRequest, { RequestMethod } from '../utils/sendRequest';
 
-import { LoginForm } from '../pages/login';
-import { RegisterForm } from '../pages/register';
+export type LoginForm = {
+	username: string;
+	password: string;
+};
+
+export type RegisterForm = {
+	username: string;
+	email: string;
+	password: string;
+};
 
 export const register = async (form: RegisterForm) => {
     try {

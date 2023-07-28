@@ -6,6 +6,7 @@ import {
 	SubmitHandler,
 	useForm,
 } from "react-hook-form";
+import { LoginForm, login } from "../services/userApi";
 import {
 	AuthenticationBase,
 	AuthenticationContainer,
@@ -20,7 +21,6 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { login } from "../services/userApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import PasswordInput from "../styles/components/Input/PasswordInput";
 import TextInput from "../styles/components/Input/TextInput";
@@ -28,11 +28,6 @@ import { TextLink } from "../styles/components/Link/TextLink";
 import General from "../styles/layouts/General/General";
 import { redirectUser } from "../utils/checkUser";
 import { promiseToast } from "../utils/promiseToast";
-
-export type LoginForm = {
-	username: string;
-	password: string;
-};
 
 const Login = () => {
 	const router = useRouter();
