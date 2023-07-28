@@ -1,3 +1,10 @@
+import {
+	ButtonContainer,
+	DefaultBase,
+	DefaultContainer,
+	Title,
+} from "../styles/layouts/Default/Default.style";
+
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { PrimaryButton } from "../styles/components/Button/Button";
@@ -9,9 +16,16 @@ export default function Home() {
 
 	return (
 		<General>
-			<PrimaryButton onClick={() => router.push("/send_message")}>
-				Create Chat
-			</PrimaryButton>
+			<DefaultBase>
+				<DefaultContainer>
+					<Title>Main Menu</Title>
+					<ButtonContainer>
+						<PrimaryButton onClick={() => router.push("/send_message")}>
+							Create Chat
+						</PrimaryButton>
+					</ButtonContainer>
+				</DefaultContainer>
+			</DefaultBase>
 		</General>
 	);
 }
