@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HeaderBase, HeaderContainer, Title } from "./Header.style";
+import { HeaderBase, HeaderContainer, TextLogo } from "./Header.style";
 
 import { useRouter } from "next/router";
 import { logout } from "../../../services/userApi";
@@ -32,7 +32,7 @@ const Header = () => {
 	return (
 		<HeaderBase>
 			<HeaderContainer>
-				<Title>Chess Website</Title>
+				<TextLogo onClick={() => router.push("/")}>Chess Website</TextLogo>
 			</HeaderContainer>
 			{isLoggedIn && (
 				<SecondaryButton onClick={handleLogout}>Logout</SecondaryButton>

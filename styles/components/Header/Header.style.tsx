@@ -21,7 +21,10 @@ export const HeaderContainer = styled.div`
 	align-items: center;
 `;
 
-export const Title = styled.div`
+export const TextLogo = styled.div`
 	font-size: 32px;
 	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	user-select: none;
 `;
