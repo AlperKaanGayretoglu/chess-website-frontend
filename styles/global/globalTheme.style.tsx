@@ -70,5 +70,14 @@ export const GLOBAL_THEME = createTheme({
 				},
 			},
 		},
+		MuiLink: {
+			styleOverrides: {
+				root: {
+					"&:hover": {
+						cursor: "pointer",
+					},
+				},
+			},
+		},
 	},
 });
