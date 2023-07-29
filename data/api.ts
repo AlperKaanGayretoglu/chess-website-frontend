@@ -1,11 +1,17 @@
 // ----------------------------------------- ChatController -----------------------------------------
 
-// GET /chatting/{chatId}/messages
+// GET /chat/{chatId}/messages
+export type ChatResponse = {
+	chatId: string;
+	userIds: string[];
+};
+
+// GET /chat/{chatId}/messages
 export type ChatMessages = {
 	messages: MessageOutput[];
 };
 
-// POST /chatting
+// POST /chat
 export type CreateChatRequest = {
 	usernames: string[];
 };
