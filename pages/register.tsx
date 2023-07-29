@@ -6,7 +6,7 @@ import {
 	SubmitHandler,
 	useForm,
 } from "react-hook-form";
-import { RegisterForm, register } from "../services/userApi";
+import { RegisterForm, register } from "../services/authenticationApi";
 import {
 	AuthenticationBase,
 	AuthenticationContainer,

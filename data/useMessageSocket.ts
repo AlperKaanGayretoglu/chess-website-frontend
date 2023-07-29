@@ -1,4 +1,4 @@
-import { MessageOutput, getMessageSocket } from '../services/messageApi';
+import { MessageOutput, getMessageSocket } from '../services/messageSocketApi';
 
 import useSWR from 'swr';
 

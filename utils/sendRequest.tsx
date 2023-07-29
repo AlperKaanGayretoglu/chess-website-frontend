@@ -11,7 +11,7 @@ export enum RequestMethod {
 const sendRequest = async (
 	apiUrl: string,
 	method: RequestMethod,
-	body: {} | undefined,
+	body: {} = undefined,
 	isAuthorized: boolean = true
 ) => {
 	try {

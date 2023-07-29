@@ -4,7 +4,7 @@ import { ADMIN_ONLY_PAGES, COOKIE_NAMES } from "../data/constants";
 import { GetServerSidePropsContext } from "next";
 
 export const checkIsAdmin = (ctx?: GetServerSidePropsContext) => {
-	return getCookie(COOKIE_NAMES.role, ctx)?.toString() === "ADMIN";
+	return getCookie(COOKIE_NAMES.userRole, ctx)?.toString() === "ADMIN";
 };
 
 export const checkIsLoggedIn = () => {

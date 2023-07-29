@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { HeaderBase, HeaderContainer, TextLogo } from "./Header.style";
 
 import { useRouter } from "next/router";
-import { logout } from "../../../services/userApi";
+import { logout } from "../../../services/authenticationApi";
 import { checkIsLoggedIn } from "../../../utils/checkUser";
 import { promiseToast } from "../../../utils/promiseToast";
 import { SecondaryButton } from "../Button/Button";
