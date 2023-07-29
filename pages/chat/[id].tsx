@@ -8,10 +8,10 @@ import { getCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { MessageOutput } from "../../data/api";
 import { COOKIE_NAMES } from "../../data/constants";
 import { useChatMessages } from "../../data/useChatMessages";
 import useMessageSocket from "../../data/useMessageSocket";
-import { MessageOutput } from "../../services/messageSocketApi";
 import General from "../../styles/layouts/General/General";
 import { redirectUser } from "../../utils/checkUser";
 
@@ -26,7 +26,7 @@ export default function Home() {
 
 	const [message, setMessage] = useState("");
 
-	const data = useChatMessages(chatId).data;
+	const { data, isLoading } = useChatMessages(chatId);
 
 	// Do this when a message is received
 	function getMessageCallback(message: MessageOutput) {
@@ -61,15 +61,16 @@ export default function Home() {
 					/>
 					<button onClick={sendMessage}>Send</button>
 					<div id="stomp-table">
-						{data?.messages?.map((message, index) => {
-							return (
-								<div key={index}>
-									<p>
-										[{message.username}] {message.text}
-									</p>
-								</div>
-							);
-						})}
+						{!isLoading &&
+							data?.messages?.map((message, index) => {
+								return (
+									<div key={index}>
+										<p>
+											[{message.username}] {message.text}
+										</p>
+									</div>
+								);
+							})}
 					</div>
 				</DefaultContainer>
 			</DefaultBase>
