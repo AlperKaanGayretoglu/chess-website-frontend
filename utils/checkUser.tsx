@@ -12,9 +12,10 @@ export const checkIsLoggedIn = () => {
 };
 
 export const redirectUser = (ctx: GetServerSidePropsContext) => {
-	const isInLoginPage =
+	const isInAuthenticationPage =
 		ctx.resolvedUrl?.includes("/login") ||
 		ctx.resolvedUrl?.includes("/register");
+
 	const isAdmin = checkIsAdmin(ctx);
 	const token = getCookie(COOKIE_NAMES.token, ctx);
 
@@ -31,7 +32,7 @@ export const redirectUser = (ctx: GetServerSidePropsContext) => {
 		}
 	}
 
-	if (token && isInLoginPage) {
+	if (token && isInAuthenticationPage) {
 		return {
 			redirect: {
 				permanent: false,
@@ -40,11 +41,11 @@ export const redirectUser = (ctx: GetServerSidePropsContext) => {
 		};
 	}
 
-	if (!token && !isInLoginPage) {
+	if (!token && !isInAuthenticationPage) {
 		return {
 			redirect: {
 				permanent: false,
-				destination: "/register",
+				destination: "/login",
 			},
 		};
 	}
