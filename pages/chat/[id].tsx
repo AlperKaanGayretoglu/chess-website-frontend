@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { MessageOutput } from "../../data/api";
 import { COOKIE_NAMES } from "../../data/constants";
+import { useChat } from "../../data/useChat";
 import { useChatMessages } from "../../data/useChatMessages";
 import useMessageSocket from "../../data/useMessageSocket";
 import General from "../../styles/layouts/General/General";
@@ -19,14 +20,18 @@ export default function Home() {
 	const param = useRouter().query;
 	const { id } = param;
 	const chatId = id as string;
-	const userId = getCookie(COOKIE_NAMES.userId);
+	const userId = getCookie(COOKIE_NAMES.userId) as string;
 
 	// TODO: Live reload messes things up (what to do about it?) (if the user can't do something like that, then it's not a problem???)
-	const messageSocket = useMessageSocket(getMessageCallback).data.messageSocket;
+	const messageSocket = useMessageSocket(chatId, getMessageCallback).data
+		.messageSocket;
 
 	const [message, setMessage] = useState("");
 
 	const { data, isLoading } = useChatMessages(chatId);
+
+	const chat = useChat(chatId).data;
+	const isInChat = chat?.userIds?.includes(userId);
 
 	// Do this when a message is received
 	function getMessageCallback(message: MessageOutput) {
@@ -35,7 +40,9 @@ export default function Home() {
 
 		const mainElement = document.getElementById("stomp-table");
 
-		mainElement.appendChild(messageElement);
+		if (mainElement) {
+			mainElement.appendChild(messageElement);
+		}
 	}
 
 	function sendMessage() {
@@ -51,15 +58,21 @@ export default function Home() {
 			<DefaultBase>
 				<DefaultContainer>
 					<Title>Chat</Title>
-					<input
-						id="message"
-						onChange={() =>
-							setMessage(
-								(document.getElementById("message") as HTMLInputElement).value
-							)
-						}
-					/>
-					<button onClick={sendMessage}>Send</button>
+					{isInChat && (
+						<>
+							<input
+								id="message"
+								onChange={() =>
+									setMessage(
+										(document.getElementById("message") as HTMLInputElement)
+											.value
+									)
+								}
+							/>
+							<button onClick={sendMessage}>Send</button>
+						</>
+					)}
+
 					<div id="stomp-table">
 						{!isLoading &&
 							data?.messages?.map((message, index) => {
