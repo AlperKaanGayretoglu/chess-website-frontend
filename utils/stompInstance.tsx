@@ -43,6 +43,10 @@ export default class StompWebSocket<T> {
 		return this;
 	}
 
+	public unsubscribe() {
+		this.stompClient.unsubscribe(this.subscriptionUrl);
+	}
+
 	public sendMessage(jsonObj: T) {
 		if (this.stompClient.connected) {
 			this.stompClient.send(
