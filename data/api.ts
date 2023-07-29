@@ -7,7 +7,7 @@ export type ChatMessages = {
 
 // POST /chatting
 export type CreateChatRequest = {
-	userIds: string[];
+	usernames: string[];
 };
 
 // ----------------------------------------- AuthenticationController -----------------------------------------

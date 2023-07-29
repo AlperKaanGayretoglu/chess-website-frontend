@@ -28,3 +28,12 @@ export const TextLogo = styled.div`
 	cursor: pointer;
 	user-select: none;
 `;
+
+export const HeaderText = styled.div`
+	margin: 20px;
+	font-size: 24px;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	user-select: none;
+`;

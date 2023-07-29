@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { HeaderBase, HeaderContainer, TextLogo } from "./Header.style";
+import {
+	HeaderBase,
+	HeaderContainer,
+	HeaderText,
+	TextLogo,
+} from "./Header.style";
 
+import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
+import { COOKIE_NAMES } from "../../../data/constants";
 import { logout } from "../../../services/authenticationApi";
 import { checkIsLoggedIn } from "../../../utils/checkUser";
 import { promiseToast } from "../../../utils/promiseToast";
@@ -15,6 +22,8 @@ const Header = () => {
 	}, []);
 
 	const router = useRouter();
+
+	const username = getCookie(COOKIE_NAMES.username) as string;
 
 	const handleLogout = () => {
 		if (
@@ -35,7 +44,10 @@ const Header = () => {
 				<TextLogo onClick={() => router.push("/")}>Chess Website</TextLogo>
 			</HeaderContainer>
 			{isLoggedIn && (
-				<SecondaryButton onClick={handleLogout}>Logout</SecondaryButton>
+				<>
+					<HeaderText>{username}</HeaderText>
+					<SecondaryButton onClick={handleLogout}>Logout</SecondaryButton>
+				</>
 			)}
 		</HeaderBase>
 	);

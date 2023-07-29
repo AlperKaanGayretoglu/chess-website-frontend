@@ -5,10 +5,13 @@ import {
 	Title,
 } from "../styles/layouts/Default/Default.style";
 
+import { getCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
+import { COOKIE_NAMES } from "../data/constants";
 import { createChat } from "../services/chatApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
+import TextInput from "../styles/components/Input/TextInput";
 import General from "../styles/layouts/General/General";
 import { redirectUser } from "../utils/checkUser";
 import { promiseToast } from "../utils/promiseToast";
@@ -16,13 +19,16 @@ import { promiseToast } from "../utils/promiseToast";
 export default function Home() {
 	const router = useRouter();
 
+	const username = getCookie(COOKIE_NAMES.username) as string;
+
 	async function promptCreateChat() {
+		const other_username = (
+			document.getElementById("other_username") as HTMLInputElement
+		).value;
+
 		const res = await promiseToast(
 			createChat({
-				userIds: [
-					"f6dd3821-d79b-49e5-98a9-94783be7ab98",
-					"cdf8d686-3bbb-4a64-a8ee-dd24df45e7d9",
-				],
+				usernames: [username, other_username],
 			}),
 			"create_chat_toast_id",
 			"Chat Created Successfully",
@@ -43,6 +49,11 @@ export default function Home() {
 						<PrimaryButton onClick={promptCreateChat}>
 							Create Chat
 						</PrimaryButton>
+						<TextInput
+							id="other_username"
+							label={"With:"}
+							placeholder="Username"
+						/>
 					</ButtonContainer>
 				</DefaultContainer>
 			</DefaultBase>
