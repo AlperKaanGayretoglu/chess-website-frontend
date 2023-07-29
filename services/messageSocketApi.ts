@@ -1,20 +1,9 @@
+import { MessageInput, MessageOutput } from "../data/api";
 import { API_WEBSOCKET_ENDPOINTS, COOKIE_NAMES } from "../data/constants";
 
 import { getCookie } from "cookies-next";
 import Stomp from "stompjs";
 import StompWebSocket from "../utils/stompInstance";
-
-export interface MessageInput {
-	chatId: string;
-	fromUserId: string;
-	text: string;
-}
-
-export interface MessageOutput {
-	username: string;
-	text: string;
-	time: string;
-}
 
 class MessageSocket extends StompWebSocket<MessageInput> {
 	constructor(

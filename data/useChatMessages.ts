@@ -1,10 +1,6 @@
 import useSWR from "swr";
 import { getChatMessages } from "../services/chatApi";
-import { MessageOutput } from "../services/messageSocketApi";
-
-export type ChatMessages = {
-	messages: MessageOutput[];
-};
+import { ChatMessages } from "./api";
 
 export function useChatMessages(chatId: string) {
 	const { data, isLoading, error, mutate } = useSWR(
