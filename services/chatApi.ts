@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from "../data/constants";
 export const getChatMessages = async (chatId: string) => {
 	try {
 		return await sendRequest(
-			API_ENDPOINTS.chat + "/" + chatId + "/messages",
+			API_ENDPOINTS.chatting + "/" + chatId + "/messages",
 			RequestMethod.GET
 		);
 	} catch (error) {
@@ -16,7 +16,11 @@ export const getChatMessages = async (chatId: string) => {
 
 export const createChat = async (request: CreateChatRequest) => {
 	try {
-		return await sendRequest(API_ENDPOINTS.chat, RequestMethod.POST, request);
+		return await sendRequest(
+			API_ENDPOINTS.chatting,
+			RequestMethod.POST,
+			request
+		);
 	} catch (error) {
 		console.log("[ERROR]: " + error);
 	}

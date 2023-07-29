@@ -11,11 +11,11 @@ class MessageSocket extends StompWebSocket<MessageInput> {
 		token: string | true
 	) {
 		super(
-			API_WEBSOCKET_ENDPOINTS.CHAT,
-			"/secured/chat_messages",
+			API_WEBSOCKET_ENDPOINTS.CHAT.main,
+			API_WEBSOCKET_ENDPOINTS.CHAT.subscribe,
+			API_WEBSOCKET_ENDPOINTS.CHAT.send,
 			(message: Stomp.Message) =>
 				getMessageCallback(JSON.parse(message.body) as MessageOutput),
-			"/app/secured/chatting",
 			{
 				"Content-Type": "application/json",
 				Authorization: "Bearer " + token,

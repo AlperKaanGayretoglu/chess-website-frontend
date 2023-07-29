@@ -1,6 +1,6 @@
-import { MessageOutput, getMessageSocket } from "../services/messageSocketApi";
-
 import useSWR from "swr";
+import { getMessageSocket } from "../services/messageSocketApi";
+import { MessageOutput } from "./api";
 
 export default function useMessageSocket(
 	getMessageCallback: (message: MessageOutput) => void

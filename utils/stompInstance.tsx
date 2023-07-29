@@ -13,8 +13,8 @@ export default class StompWebSocket<T> {
 	constructor(
 		connectionUrl: string,
 		subscriptionUrl: string,
-		getMessageCallback: (message: Stomp.Message) => void,
 		sendUrl: string,
+		getMessageCallback: (message: Stomp.Message) => void,
 		headers?: {}
 	) {
 		this.subscriptionUrl = subscriptionUrl;
