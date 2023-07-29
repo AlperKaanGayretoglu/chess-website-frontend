@@ -3,11 +3,12 @@ import { getMessageSocket } from "../services/messageSocketApi";
 import { MessageOutput } from "./api";
 
 export default function useMessageSocket(
+	chatId: string,
 	getMessageCallback: (message: MessageOutput) => void
 ) {
 	const { data, isLoading, error, mutate } = useSWR(
 		"api_message",
-		() => getMessageSocket(getMessageCallback),
+		() => getMessageSocket(chatId, getMessageCallback),
 		{
 			revalidateOnFocus: false,
 			revalidateOnMount: true,

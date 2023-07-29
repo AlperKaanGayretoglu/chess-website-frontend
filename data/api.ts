@@ -43,7 +43,6 @@ export type AuthenticationResponse = {
 
 // MESSAGE MAPPING /secured/chatting
 export type MessageInput = {
-	chatId: string;
 	fromUserId: string;
 	text: string;
 };

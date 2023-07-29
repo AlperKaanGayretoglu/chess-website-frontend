@@ -47,7 +47,6 @@ export default function Home() {
 
 	function sendMessage() {
 		messageSocket.sendMessage({
-			chatId: chatId,
 			fromUserId: userId as string,
 			text: message,
 		});

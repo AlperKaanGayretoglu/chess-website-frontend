@@ -1,3 +1,5 @@
+import { MessageSocket } from "../services/messageSocketApi";
+
 export const COOKIE_NAMES = {
 	userId: "chessWebsite_userId",
 	username: "chessWebsite_username",
@@ -12,7 +14,7 @@ export const API_MAIN_URL = "http://localhost:8080";
 export const API_ENDPOINTS = {
 	register: API_MAIN_URL + "/auth/register",
 	login: API_MAIN_URL + "/auth/login",
-	chatting: API_MAIN_URL + "/chatting",
+	chat: API_MAIN_URL + "/chat",
 };
 
 export const API_WEBSOCKET_ENDPOINTS = {
@@ -21,4 +23,13 @@ export const API_WEBSOCKET_ENDPOINTS = {
 		subscribe: "/secured/chat_messages",
 		send: "/app/secured/chatting",
 	},
+};
+
+export type ChatIdToSocketConnection = {
+	chatId: string;
+	connection: MessageSocket;
+};
+
+export const socketConnections = {
+	CHAT: [] as ChatIdToSocketConnection[],
 };
