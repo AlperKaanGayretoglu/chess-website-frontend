@@ -33,6 +33,12 @@ const sendRequest = async (
 		if (error.message && error.message.includes("Failed to fetch")) {
 			error.message = "Failed to Connect to Server";
 		}
+		if (
+			error.message &&
+			error.message.includes("Unexpected end of JSON input")
+		) {
+			error.message = "Authenticated User Not Found\n[TIP]: Try to login again";
+		}
 		return Promise.resolve(error);
 	}
 };
