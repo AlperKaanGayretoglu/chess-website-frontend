@@ -6,7 +6,6 @@ import {
 	SubmitHandler,
 	useForm,
 } from "react-hook-form";
-import { RegisterForm, register } from "../services/authenticationApi";
 import {
 	AuthenticationBase,
 	AuthenticationContainer,
@@ -22,6 +21,8 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
+import { RegisterForm } from "../data/api";
+import { register } from "../services/authenticationApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import MailInput from "../styles/components/Input/MailInput";
 import PasswordInput from "../styles/components/Input/PasswordInput";

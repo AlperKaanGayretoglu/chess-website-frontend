@@ -6,7 +6,6 @@ import {
 	SubmitHandler,
 	useForm,
 } from "react-hook-form";
-import { LoginForm, login } from "../services/authenticationApi";
 import {
 	AuthenticationBase,
 	AuthenticationContainer,
@@ -21,6 +20,8 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
+import { LoginForm } from "../data/api";
+import { login } from "../services/authenticationApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import PasswordInput from "../styles/components/Input/PasswordInput";
 import TextInput from "../styles/components/Input/TextInput";
