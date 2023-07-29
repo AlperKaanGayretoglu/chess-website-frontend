@@ -28,7 +28,10 @@ export default function Home() {
 			"Chat Created Successfully",
 			"Chat Creation Failed"
 		);
-		router.push("/chat/" + res.chatId);
+
+		if (!res.message) {
+			router.push("/chat/" + res.chatId);
+		}
 	}
 
 	return (
