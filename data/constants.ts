@@ -1,5 +1,6 @@
 export const COOKIE_NAMES = {
 	userId: "chessWebsite_userId",
+	username: "chessWebsite_username",
 	userRole: "chessWebsite_role",
 	token: "chessWebsite_token",
 };

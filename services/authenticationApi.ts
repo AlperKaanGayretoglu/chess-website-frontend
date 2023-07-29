@@ -1,5 +1,5 @@
 import { deleteCookie, setCookie } from "cookies-next";
-import { LoginForm, RegisterForm } from "../data/api";
+import { AuthenticationResponse, LoginForm, RegisterForm } from "../data/api";
 import { API_ENDPOINTS, COOKIE_NAMES } from "../data/constants";
 import sendRequest, { RequestMethod } from "../utils/sendRequest";
 
@@ -13,9 +13,11 @@ export const register = async (form: RegisterForm) => {
 		);
 
 		if (result && result.token) {
-			setCookie(COOKIE_NAMES.userId, result.id);
-			setCookie(COOKIE_NAMES.userRole, result.userRole);
-			setCookie(COOKIE_NAMES.token, result.token);
+			const response = result as AuthenticationResponse;
+			setCookie(COOKIE_NAMES.userId, response.id);
+			setCookie(COOKIE_NAMES.username, response.username);
+			setCookie(COOKIE_NAMES.userRole, response.userRole);
+			setCookie(COOKIE_NAMES.token, response.token);
 		}
 
 		return result;
@@ -34,9 +36,11 @@ export const login = async (form: LoginForm) => {
 		);
 
 		if (result && result.token) {
-			setCookie(COOKIE_NAMES.userId, result.id);
-			setCookie(COOKIE_NAMES.userRole, result.role);
-			setCookie(COOKIE_NAMES.token, result.token);
+			const response = result as AuthenticationResponse;
+			setCookie(COOKIE_NAMES.userId, response.id);
+			setCookie(COOKIE_NAMES.username, response.username);
+			setCookie(COOKIE_NAMES.userRole, response.userRole);
+			setCookie(COOKIE_NAMES.token, response.token);
 		}
 
 		return result;

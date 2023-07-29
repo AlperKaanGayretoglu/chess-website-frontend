@@ -25,6 +25,14 @@ export type RegisterForm = {
 	password: string;
 };
 
+// POST /auth
+export type AuthenticationResponse = {
+	id: string;
+	username: string;
+	userRole: string;
+	token: string;
+};
+
 // ----------------------------------------- MessageController -----------------------------------------
 
 // MESSAGE MAPPING /secured/chatting
