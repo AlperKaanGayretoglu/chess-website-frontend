@@ -16,12 +16,25 @@ const sendRequest = async (
 ) => {
 	try {
 		const token = getCookie(COOKIE_NAMES.token);
-		if (token || !isAuthorized) {
+		if (token) {
 			const res = await fetch(apiUrl, {
 				method: method.toString(),
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: "Bearer " + token,
+				},
+				body: JSON.stringify(body),
+			});
+
+			const result = await res.json();
+			return result;
+		}
+
+		if (!isAuthorized) {
+			const res = await fetch(apiUrl, {
+				method: method.toString(),
+				headers: {
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(body),
 			});
