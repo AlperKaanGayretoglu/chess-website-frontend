@@ -107,7 +107,7 @@ const ChessBoard = ({
 					);
 				})}
 			</div>
-			<Title>Chat</Title>
+			<Title>Send Move</Title>
 			<div>
 				{isInGame ? (
 					<div>

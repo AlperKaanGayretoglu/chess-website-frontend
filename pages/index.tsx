@@ -48,7 +48,7 @@ export default function Home() {
 					<Title>Main Menu</Title>
 					<ButtonContainer>
 						<PrimaryButton onClick={promptCreateChessGame}>
-							Create Chat
+							Create Chess Game
 						</PrimaryButton>
 						<TextInput
 							id="other_username"
