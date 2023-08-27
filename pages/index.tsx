@@ -9,7 +9,7 @@ import { getCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { COOKIE_NAMES } from "../data/constants";
-import { createChat } from "../services/chatApi";
+import { createChessGame } from "../services/chessGameApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import TextInput from "../styles/components/Input/TextInput";
 import General from "../styles/layouts/General/General";
@@ -21,22 +21,23 @@ export default function Home() {
 
 	const username = getCookie(COOKIE_NAMES.username) as string;
 
-	async function promptCreateChat() {
+	async function promptCreateChessGame() {
 		const other_username = (
 			document.getElementById("other_username") as HTMLInputElement
 		).value;
 
 		const res = await promiseToast(
-			createChat({
-				usernames: [username, other_username],
+			createChessGame({
+				firstPlayerUsername: username,
+				secondPlayerUsername: other_username,
 			}),
-			"create_chat_toast_id",
-			"Chat Created Successfully",
-			"Chat Creation Failed"
+			"create_chess_game_toast_id",
+			"Chess Game Created Successfully",
+			"Chess Game Creation Failed"
 		);
 
 		if (!res.message) {
-			router.push("/chat/" + res.chatId);
+			router.push("/game/" + res.gameId);
 		}
 	}
 
@@ -46,7 +47,7 @@ export default function Home() {
 				<DefaultContainer>
 					<Title>Main Menu</Title>
 					<ButtonContainer>
-						<PrimaryButton onClick={promptCreateChat}>
+						<PrimaryButton onClick={promptCreateChessGame}>
 							Create Chat
 						</PrimaryButton>
 						<TextInput
