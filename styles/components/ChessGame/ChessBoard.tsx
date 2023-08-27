@@ -1,146 +1,180 @@
-import { Dispatch, SetStateAction } from "react";
+import { ChessCoordinate, ChessSquareResponse } from "../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
-import { ChessSquareResponse } from "../../../data/api";
+import { useState } from "react";
+import ChessBoardImage from "../../../images/chess/board/ChessBoardImage";
 import { redirectUser } from "../../../utils/checkUser";
 import { Title } from "../../layouts/Default/Default.style";
-import ChessPiece from "./ChessPiece";
+import ChessPieces from "./ChessPieces/ChessPieces";
+import ChessShapes from "./ChessShapes/ChessShapes";
 
 const ChessBoard = ({
 	board,
 	isInGame,
-	coordinates,
-	setCoordinates,
 	sendChessMove,
 }: {
 	board: ChessSquareResponse[][];
 	isInGame: boolean;
-	coordinates: {
+	sendChessMove: (chessMove: {
 		fromRow: number;
 		fromColumn: number;
 		toRow: number;
 		toColumn: number;
-	};
-	setCoordinates: Dispatch<
-		SetStateAction<{
-			fromRow: number;
-			fromColumn: number;
-			toRow: number;
-			toColumn: number;
-		}>
-	>;
-	sendChessMove: () => void;
+	}) => void;
 }) => {
-	const squareSideLength = 85;
+	const [left, setLeft] = useState(0);
+	const [top, setTop] = useState(0);
+	const [size, setSize] = useState(0);
+
+	const [shapes, setShapes] = useState<ChessCoordinate[]>([]);
+
+	const [selectedCoordinates, setSelectedCoordinates] = useState<{
+		row: number;
+		column: number;
+	}>(null);
+
+	const [isDragging, setIsDragging] = useState(false);
+	const [isMouseDown, setIsMouseDown] = useState(false);
+	const [startCoordinates, setStartCoordinates] = useState<{
+		row: number;
+		column: number;
+	}>(null);
+
+	function handleResize(newPosition: {
+		left: number;
+		top: number;
+		size: number;
+	}) {
+		setLeft(newPosition.left);
+		setTop(newPosition.top);
+		setSize(newPosition.size);
+	}
+
+	function handleClick(event: { clientX: number; clientY: number }) {
+		if (isDragging) {
+			return;
+		}
+
+		const x = event.clientX;
+		const y = event.clientY;
+		const row = Math.floor((y - top) / (size / 8));
+		const column = Math.floor((x - left) / (size / 8));
+
+		if (!selectedCoordinates) {
+			if (board[row][column]?.chessPiece) {
+				setSelectedCoordinates({ row, column });
+				setShapes([{ row, column }]);
+			}
+		} else {
+			if (
+				(selectedCoordinates.row === row &&
+					selectedCoordinates.column === column) ||
+				board[row][column]?.chessPiece?.chessColor ===
+					board[selectedCoordinates.row][selectedCoordinates.column]?.chessPiece
+						?.chessColor
+			) {
+				setSelectedCoordinates(null);
+				setShapes([]);
+				return;
+			}
+			const chessMove = {
+				fromRow: selectedCoordinates.row,
+				fromColumn: selectedCoordinates.column,
+				toRow: row,
+				toColumn: column,
+			};
+			setSelectedCoordinates(null);
+			setShapes([]);
+			sendChessMove(chessMove);
+		}
+	}
+
+	function handleMouseDown() {
+		setIsMouseDown(true);
+	}
+
+	function handleMouseMove(event: {
+		clientX: number;
+		clientY: number;
+		preventDefault: () => void;
+	}) {
+		event.preventDefault();
+
+		if (!isMouseDown) {
+			return;
+		}
+
+		const x = event.clientX;
+		const y = event.clientY;
+
+		const row = Math.floor((y - top) / (size / 8));
+		const column = Math.floor((x - left) / (size / 8));
+
+		if (!isDragging) {
+			if (!board[row][column]?.chessPiece) {
+				return;
+			}
+			setSelectedCoordinates(null);
+			setShapes([]);
+			setIsDragging(true);
+			setStartCoordinates({ row, column });
+		}
+	}
+
+	function handleMouseUp(event: { clientX: number; clientY: number }) {
+		setIsMouseDown(false);
+
+		if (!isDragging) {
+			return;
+		}
+
+		const x = event.clientX;
+		const y = event.clientY;
+
+		const row = Math.floor((y - top) / (size / 8));
+		const column = Math.floor((x - left) / (size / 8));
+
+		const chessMove = {
+			fromRow: startCoordinates.row,
+			fromColumn: startCoordinates.column,
+			toRow: row,
+			toColumn: column,
+		};
+
+		setIsDragging(false);
+		setStartCoordinates(null);
+
+		sendChessMove(chessMove);
+	}
 
 	return (
 		<div>
-			<div>
-				{board?.map((row, rowIndex) => {
-					return (
-						<div key={rowIndex} style={{ display: "flex" }}>
-							{row.map((square: ChessSquareResponse, columnIndex: number) => {
-								return (
-									<div
-										key={columnIndex}
-										style={{
-											width: squareSideLength,
-											height: squareSideLength,
-											backgroundColor:
-												square?.chessColor === "BLACK" ? "gray" : "lightgray",
-										}}
-										onClick={() => {
-											console.log(rowIndex + " " + columnIndex);
-										}}
-									>
-										<ChessPiece
-											chessColor={square?.chessPiece?.chessColor}
-											chessPieceType={square?.chessPiece?.chessPieceType}
-											pixelCoordinates={{
-												x: columnIndex + squareSideLength / 3,
-												y: rowIndex + squareSideLength / 3,
-											}}
-										/>
-									</div>
-								);
-							})}
-						</div>
-					);
-				})}
-			</div>
-			<Title>Send Move</Title>
-			<div>
-				{isInGame ? (
-					<div>
-						<div>
-							<label>From Row</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										fromRow: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>From Column</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										fromColumn: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>To Row</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										toRow: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>To Column</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										toColumn: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<button onClick={sendChessMove}>Send</button>
+			{isInGame ? (
+				<div>
+					<div
+						onClick={handleClick}
+						onMouseDown={handleMouseDown}
+						onMouseUp={handleMouseUp}
+						onMouseMove={handleMouseMove}
+					>
+						<ChessBoardImage onResize={handleResize} />
+						<ChessShapes shapes={shapes} left={left} top={top} size={size} />
+						<ChessPieces board={board} left={left} top={top} size={size} />
 					</div>
-				) : (
+					<Title>Send Move</Title>
+					<div id="stomp-table"></div>
+				</div>
+			) : (
+				<div>
 					<div>
-						<div>
-							<label>From Row</label>
-							<input />
-						</div>
-						<div>
-							<label>From Column</label>
-							<input />
-						</div>
-						<div>
-							<label>To Row</label>
-							<input />
-						</div>
-						<div>
-							<label>To Column</label>
-							<input />
-						</div>
-						<button>Send</button>
+						<ChessBoardImage onResize={handleResize} />
+						<ChessShapes shapes={shapes} left={left} top={top} size={size} />
+						<ChessPieces board={board} left={left} top={top} size={size} />
 					</div>
-				)}
-			</div>
-			<div id="stomp-table"></div>
+					<Title>Send Move</Title>
+					<div id="stomp-table"></div>
+				</div>
+			)}
 		</div>
 	);
 };

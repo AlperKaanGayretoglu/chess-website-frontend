@@ -28,12 +28,6 @@ const ChessGame = ({
 		game?.playerWhiteUsername === username;
 
 	const [board, setBoard] = useState<ChessSquareResponse[][]>([]);
-	const [coordinates, setCoordinates] = useState({
-		fromRow: 0,
-		fromColumn: 0,
-		toRow: 0,
-		toColumn: 0,
-	});
 
 	const [legalMoves, setLegalMoves] = useState<ChessMoveResponse[]>([]);
 
@@ -64,12 +58,16 @@ const ChessGame = ({
 		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
 	}
 
-	function sendChessMove() {
+	function sendChessMove(coordinates: {
+		fromRow: number;
+		fromColumn: number;
+		toRow: number;
+		toColumn: number;
+	}) {
 		const move = legalMoves.find((move) => {
 			const playedMove = move.playedPieceMove;
 			const from = playedMove.from;
 			const to = playedMove.to;
-			console.log(from, to);
 			return (
 				from.row === coordinates.fromRow &&
 				from.column === coordinates.fromColumn &&
@@ -104,8 +102,6 @@ const ChessGame = ({
 			<ChessBoard
 				board={board}
 				isInGame={isInGame}
-				coordinates={coordinates}
-				setCoordinates={setCoordinates}
 				sendChessMove={sendChessMove}
 			/>
 		</div>
