@@ -23,3 +23,10 @@ export async function promiseToast(
 		return error;
 	}
 }
+
+export async function showErrorToast(
+	toast_id: string = "default_toast_id",
+	default_error_message: string = "Something Went Wrong"
+) {
+	toast.error(default_error_message, { id: toast_id });
+}
