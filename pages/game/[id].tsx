@@ -7,7 +7,7 @@ import { getCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { COOKIE_NAMES } from "../../data/constants";
-import ChessBoard from "../../styles/components/ChessBoard/ChessBoard";
+import ChessGame from "../../styles/components/ChessGame/ChessGame";
 import General from "../../styles/layouts/General/General";
 import { redirectUser } from "../../utils/checkUser";
 
@@ -21,7 +21,7 @@ export default function Home() {
 		<General>
 			<DefaultBase>
 				<DefaultContainer>
-					<ChessBoard gameId={gameId} username={username} />
+					<ChessGame gameId={gameId} username={username} />
 				</DefaultContainer>
 			</DefaultBase>
 		</General>

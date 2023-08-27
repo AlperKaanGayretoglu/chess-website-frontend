@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+	ChessMoveResponse,
 	ChessSquareResponse,
 	PlayedChessMoveResponse,
 } from "../../../data/api";
@@ -8,9 +9,10 @@ import { GetServerSidePropsContext } from "next";
 import { useChessGame } from "../../../data/useChessGame";
 import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
+import { showErrorToast } from "../../../utils/promiseToast";
 import { Title } from "../../layouts/Default/Default.style";
 
-const ChessBoard = ({
+const ChessGame = ({
 	gameId,
 	username,
 }: {
@@ -20,22 +22,30 @@ const ChessBoard = ({
 	const chessMoveSocket = useChessMoveSocket(gameId, getChessMoveCallback).data
 		.chessMoveSocket;
 
-	const [board, setBoard] = useState([]);
-
 	let game = useChessGame(gameId).data;
 	const isInGame =
 		game?.playerBlackUsername === username ||
 		game?.playerWhiteUsername === username;
 
+	const [board, setBoard] = useState([]);
+	const [coordinates, setCoordinates] = useState({
+		fromRow: 0,
+		fromColumn: 0,
+		toRow: 0,
+		toColumn: 0,
+	});
+
+	const [legalMoves, setLegalMoves] = useState<ChessMoveResponse[]>([]);
+
 	useEffect(() => {
 		if (game) {
 			setBoard(game?.board?.board);
+			setLegalMoves(game?.legalMovesForCurrentPlayer);
+
 			console.log("Legal Moves:");
 			console.log(game?.legalMovesForCurrentPlayer);
 		}
 	}, [game]);
-
-	const [chessMove, setChessMove] = useState("");
 
 	// Do this when a chessMove is received
 	function getChessMoveCallback(chessMove: PlayedChessMoveResponse) {
@@ -48,22 +58,44 @@ const ChessBoard = ({
 			mainElement.appendChild(chessMoveElement);
 		}
 
-		console.log("Played Chess Move:");
-		console.log(chessMove);
-
-		console.log("Board:");
-		console.log(chessMove.chessBoard);
-
 		console.log("New Legal Moves:");
 		console.log(chessMove.legalMovesForCurrentPlayer);
 
-		setBoard(chessMove.chessBoard.board);
+		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
 	}
 
 	function sendChessMove() {
+		const move = legalMoves.find((move) => {
+			const playedMove = move.playedPieceMove;
+			const from = playedMove.from;
+			const to = playedMove.to;
+			console.log(from, to);
+			return (
+				from.row === coordinates.fromRow &&
+				from.column === coordinates.fromColumn &&
+				to.row === coordinates.toRow &&
+				to.column === coordinates.toColumn
+			);
+		});
+
+		if (!move) {
+			showErrorToast("chess_move_error", "Invalid Chess Move");
+			return;
+		}
+
+		const from = move.playedPieceMove.from;
+		const to = move.playedPieceMove.to;
+
+		setBoard((board) => {
+			const newBoard = [...board];
+			newBoard[to.row][to.column] = newBoard[from.row][from.column];
+			newBoard[from.row][from.column] = null;
+			return newBoard;
+		});
+
 		chessMoveSocket.sendMessage({
 			username: username as string,
-			chessMoveId: chessMove,
+			chessMoveId: move.id,
 		});
 	}
 
@@ -86,19 +118,19 @@ const ChessBoard = ({
 											justifyContent: "center",
 											alignItems: "center",
 											backgroundColor:
-												square.chessColor === "BLACK" ? "gray" : "lightgray",
+												square?.chessColor === "BLACK" ? "gray" : "lightgray",
 										}}
 									>
 										<p
 											style={{
 												color:
-													square.chessPiece?.chessColor === "BLACK"
+													square?.chessPiece?.chessColor === "BLACK"
 														? "black"
 														: "white",
 												fontWeight: "bold",
 											}}
 										>
-											{square.chessPiece?.chessPieceType}
+											{square?.chessPiece?.chessPieceType}
 										</p>
 									</div>
 								);
@@ -111,12 +143,70 @@ const ChessBoard = ({
 			<div>
 				{isInGame ? (
 					<div>
-						<input onChange={(event) => setChessMove(event.target.value)} />
+						<div>
+							<label>From Row</label>
+							<input
+								onChange={(event) =>
+									setCoordinates({
+										...coordinates,
+										fromRow: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
+						<div>
+							<label>From Column</label>
+							<input
+								onChange={(event) =>
+									setCoordinates({
+										...coordinates,
+										fromColumn: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
+						<div>
+							<label>To Row</label>
+							<input
+								onChange={(event) =>
+									setCoordinates({
+										...coordinates,
+										toRow: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
+						<div>
+							<label>To Column</label>
+							<input
+								onChange={(event) =>
+									setCoordinates({
+										...coordinates,
+										toColumn: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
 						<button onClick={sendChessMove}>Send</button>
 					</div>
 				) : (
 					<div>
-						<input />
+						<div>
+							<label>From Row</label>
+							<input />
+						</div>
+						<div>
+							<label>From Column</label>
+							<input />
+						</div>
+						<div>
+							<label>To Row</label>
+							<input />
+						</div>
+						<div>
+							<label>To Column</label>
+							<input />
+						</div>
 						<button>Send</button>
 					</div>
 				)}
@@ -126,7 +216,7 @@ const ChessBoard = ({
 	);
 };
 
-export default ChessBoard;
+export default ChessGame;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	return redirectUser(ctx) ?? { props: {} };
