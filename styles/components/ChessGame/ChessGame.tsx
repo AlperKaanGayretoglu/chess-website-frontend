@@ -10,7 +10,7 @@ import { useChessGame } from "../../../data/useChessGame";
 import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
 import { showErrorToast } from "../../../utils/promiseToast";
-import { Title } from "../../layouts/Default/Default.style";
+import ChessBoard from "./ChessBoard";
 
 const ChessGame = ({
 	gameId,
@@ -27,7 +27,7 @@ const ChessGame = ({
 		game?.playerBlackUsername === username ||
 		game?.playerWhiteUsername === username;
 
-	const [board, setBoard] = useState([]);
+	const [board, setBoard] = useState<ChessSquareResponse[][]>([]);
 	const [coordinates, setCoordinates] = useState({
 		fromRow: 0,
 		fromColumn: 0,
@@ -101,117 +101,13 @@ const ChessGame = ({
 
 	return (
 		<div>
-			<div>
-				{board?.map((row, rowIndex) => {
-					return (
-						<div key={rowIndex} style={{ display: "flex", margin: "2px" }}>
-							{row.map((square: ChessSquareResponse, squareIndex: number) => {
-								return (
-									<div
-										key={squareIndex}
-										style={{
-											display: "flex",
-											margin: "2px",
-											border: "1px solid black",
-											width: "75px",
-											height: "75px",
-											justifyContent: "center",
-											alignItems: "center",
-											backgroundColor:
-												square?.chessColor === "BLACK" ? "gray" : "lightgray",
-										}}
-									>
-										<p
-											style={{
-												color:
-													square?.chessPiece?.chessColor === "BLACK"
-														? "black"
-														: "white",
-												fontWeight: "bold",
-											}}
-										>
-											{square?.chessPiece?.chessPieceType}
-										</p>
-									</div>
-								);
-							})}
-						</div>
-					);
-				})}
-			</div>
-			<Title>Send Move</Title>
-			<div>
-				{isInGame ? (
-					<div>
-						<div>
-							<label>From Row</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										fromRow: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>From Column</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										fromColumn: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>To Row</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										toRow: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label>To Column</label>
-							<input
-								onChange={(event) =>
-									setCoordinates({
-										...coordinates,
-										toColumn: parseInt(event.target.value),
-									})
-								}
-							/>
-						</div>
-						<button onClick={sendChessMove}>Send</button>
-					</div>
-				) : (
-					<div>
-						<div>
-							<label>From Row</label>
-							<input />
-						</div>
-						<div>
-							<label>From Column</label>
-							<input />
-						</div>
-						<div>
-							<label>To Row</label>
-							<input />
-						</div>
-						<div>
-							<label>To Column</label>
-							<input />
-						</div>
-						<button>Send</button>
-					</div>
-				)}
-			</div>
-			<div id="stomp-table"></div>
+			<ChessBoard
+				board={board}
+				isInGame={isInGame}
+				coordinates={coordinates}
+				setCoordinates={setCoordinates}
+				sendChessMove={sendChessMove}
+			/>
 		</div>
 	);
 };
