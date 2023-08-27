@@ -76,10 +76,10 @@ export type PlayedChessMoveResponse = {
 	playedChessMove: ChessMoveResponse;
 	currentPlayerUsername: string;
 	legalMovesForCurrentPlayer: ChessMoveResponse[];
-	chessBoard: ChessBoardResponse;
 };
 
 export type ChessMoveResponse = {
+	id: string;
 	playedPieceMove: PieceMoveResponse;
 	triggeredPieceMoves: PieceMoveResponse[];
 };
