@@ -30,12 +30,17 @@ const ChessBoard = ({
 		toColumn: number;
 	}) => void;
 }) => {
+	// ------------------------------ STATES ------------------------------
+	// RESIZE STATE
 	const [left, setLeft] = useState(0);
 	const [top, setTop] = useState(0);
 	const [size, setSize] = useState(0);
 
+	// SHAPES STATE
 	const [pointShapes, setPointShapes] = useState<ChessCoordinate[]>([]);
 	const [squareShapes, setSquareShapes] = useState<ChessCoordinate[]>([]);
+
+	//  GHOST STATE
 	const [ghostPiece, setGhostPiece] = useState<{
 		x: number;
 		y: number;
@@ -44,18 +49,19 @@ const ChessBoard = ({
 	}>(null);
 	const [ghostLikePiece, setGhostLikePiece] = useState<ChessCoordinate>(null);
 
-	const [selectedCoordinates, setSelectedCoordinates] = useState<{
-		row: number;
-		column: number;
-	}>(null);
+	// SELECTED STATE
+	const [selectedCoordinates, setSelectedCoordinates] =
+		useState<ChessCoordinate>(null);
 
-	const [isDragging, setIsDragging] = useState(false);
+	// DRAGGING STATE
 	const [isMouseDown, setIsMouseDown] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
 	const [startCoordinates, setStartCoordinates] = useState<{
 		row: number;
 		column: number;
 	}>(null);
 
+	// ------------------------------ HANDLE EVENTS ------------------------------
 	function handleResize(newPosition: {
 		left: number;
 		top: number;
@@ -71,53 +77,12 @@ const ChessBoard = ({
 			return;
 		}
 
-		const x = event.clientX;
-		const y = event.clientY + window.scrollY;
-		const row = Math.floor((y - top) / (size / 8));
-		const column = Math.floor((x - left) / (size / 8));
+		const coordinates = getChessCoordinateFromMousePosition(event);
 
 		if (!selectedCoordinates) {
-			if (board[row][column]?.chessPiece) {
-				setSelectedCoordinates({ row, column });
-				setSquareShapes([{ row, column }]);
-				setPointShapes([]);
-				legalMoves.forEach((move) => {
-					const playedMove = move.playedPieceMove;
-					const from = playedMove.from;
-					const to = playedMove.to;
-					if (from.row === row && from.column === column) {
-						setPointShapes((shapes) => [
-							...shapes,
-							{ row: to.row, column: to.column },
-						]);
-					}
-				});
-			}
+			selectPieceAt(coordinates);
 		} else {
-			if (
-				(selectedCoordinates.row === row &&
-					selectedCoordinates.column === column) ||
-				board[row][column]?.chessPiece?.chessColor ===
-					board[selectedCoordinates.row][selectedCoordinates.column]?.chessPiece
-						?.chessColor
-			) {
-				setSelectedCoordinates(null);
-				setSquareShapes([]);
-				setPointShapes([]);
-				setGhostLikePiece(null);
-				return;
-			}
-			const chessMove = {
-				fromRow: selectedCoordinates.row,
-				fromColumn: selectedCoordinates.column,
-				toRow: row,
-				toColumn: column,
-			};
-			setSelectedCoordinates(null);
-			setSquareShapes([]);
-			setPointShapes([]);
-			setGhostLikePiece(null);
-			sendChessMove(chessMove);
+			movePieceTo(coordinates);
 		}
 	}
 
@@ -136,45 +101,14 @@ const ChessBoard = ({
 			return;
 		}
 
-		const x = event.clientX;
-		const y = event.clientY + window.scrollY;
-
-		const row = Math.floor((y - top) / (size / 8));
-		const column = Math.floor((x - left) / (size / 8));
+		const coordinates = getChessCoordinateFromMousePosition(event);
 
 		if (!isDragging) {
-			if (!board[row][column]?.chessPiece) {
-				return;
-			}
-			setSelectedCoordinates(null);
-			setSquareShapes([]);
-			setPointShapes([]);
-			legalMoves.forEach((move) => {
-				const playedMove = move.playedPieceMove;
-				const from = playedMove.from;
-				const to = playedMove.to;
-				if (from.row === row && from.column === column) {
-					setPointShapes((shapes) => [
-						...shapes,
-						{ row: to.row, column: to.column },
-					]);
-					setGhostLikePiece({ row, column });
-					setSquareShapes([{ row, column }]);
-				}
-			});
-			setIsDragging(true);
-			setStartCoordinates({ row, column });
-		} else {
-			setGhostPiece({
-				x: x,
-				y: y,
-				chessColor:
-					board[startCoordinates.row][startCoordinates.column].chessPiece
-						.chessColor,
-				chessPieceType:
-					board[startCoordinates.row][startCoordinates.column].chessPiece
-						.chessPieceType,
-			});
+			startDraggingFrom(event, coordinates);
+		}
+
+		if (startCoordinates) {
+			createGhostPieceUsing(event, startCoordinates);
 		}
 	}
 
@@ -182,25 +116,56 @@ const ChessBoard = ({
 		setIsMouseDown(false);
 		setGhostLikePiece(null);
 
-		if (!isDragging) {
+		if (isDragging) {
+			const coordinates = getChessCoordinateFromMousePosition(event);
+			dropPieceOnTo(coordinates);
+		}
+	}
+
+	// ------------------------------ PIECE MOVEMENTS ------------------------------
+	function selectPieceAt(coordinates: ChessCoordinate) {
+		if (board[coordinates.row][coordinates.column]?.chessPiece) {
+			setSelectedCoordinates(coordinates);
+			setSquareShapes([coordinates]);
+
+			visualizeLegalMovesForPieceAt(coordinates);
+		}
+	}
+
+	function startDraggingFrom(
+		event: { clientX: number; clientY: number },
+		coordinates: ChessCoordinate
+	) {
+		if (!board[coordinates.row][coordinates.column]?.chessPiece) {
 			return;
 		}
 
-		const x = event.clientX;
-		const y = event.clientY + window.scrollY;
+		setSelectedCoordinates(null);
+		setSquareShapes([coordinates]);
 
-		const row = Math.floor((y - top) / (size / 8));
-		const column = Math.floor((x - left) / (size / 8));
+		setIsDragging(true);
+		setStartCoordinates(coordinates);
 
-		if (startCoordinates.row === row && startCoordinates.column === column) {
-			setIsDragging(false);
-			setStartCoordinates(null);
-			setPointShapes([]);
-			setSquareShapes([]);
-			setGhostLikePiece(null);
-			setGhostPiece(null);
-			return;
-		}
+		setGhostLikePiece(coordinates);
+		createGhostPieceUsing(event, coordinates);
+
+		visualizeLegalMovesForPieceAt(coordinates);
+	}
+
+	function dropPiece() {
+		setSelectedCoordinates(null);
+		setPointShapes([]);
+		setSquareShapes([]);
+
+		setIsDragging(false);
+		setStartCoordinates(null);
+
+		setGhostLikePiece(null);
+		setGhostPiece(null);
+	}
+
+	function dropPieceOnTo(coordinates: ChessCoordinate) {
+		const { row, column } = coordinates;
 
 		const chessMove = {
 			fromRow: startCoordinates.row,
@@ -209,13 +174,90 @@ const ChessBoard = ({
 			toColumn: column,
 		};
 
-		setIsDragging(false);
-		setStartCoordinates(null);
-		setPointShapes([]);
-		setSquareShapes([]);
-		setGhostPiece(null);
+		const isOnSameSquare =
+			startCoordinates.row === row && startCoordinates.column === column;
 
-		sendChessMove(chessMove);
+		dropPiece();
+
+		if (!isOnSameSquare) {
+			sendChessMove(chessMove);
+		}
+	}
+
+	function movePieceTo(coordinates: ChessCoordinate) {
+		const { row, column } = coordinates;
+
+		const chessMove = {
+			fromRow: selectedCoordinates.row,
+			fromColumn: selectedCoordinates.column,
+			toRow: row,
+			toColumn: column,
+		};
+
+		const isOnSameSquare =
+			selectedCoordinates.row === row && selectedCoordinates.column === column;
+
+		const isOnSameColorPiece =
+			board[row][column]?.chessPiece?.chessColor ===
+			board[selectedCoordinates.row][selectedCoordinates.column]?.chessPiece
+				?.chessColor;
+
+		dropPiece();
+
+		if (!(isOnSameSquare || isOnSameColorPiece)) {
+			sendChessMove(chessMove);
+		}
+	}
+
+	// ------------------------------ UTILS ------------------------------
+	function getChessCoordinateFromMousePosition(event: {
+		clientX: number;
+		clientY: number;
+	}): ChessCoordinate {
+		const x = event.clientX;
+		const y = event.clientY + window.scrollY;
+
+		const row = Math.floor((y - top) / (size / 8));
+		const column = Math.floor((x - left) / (size / 8));
+
+		return { row, column };
+	}
+
+	function createGhostPieceUsing(
+		event: { clientX: number; clientY: number },
+		coordinates: ChessCoordinate
+	) {
+		const x = event.clientX;
+		const y = event.clientY + window.scrollY;
+
+		const row = coordinates.row;
+		const column = coordinates.column;
+
+		setGhostPiece({
+			x: x,
+			y: y,
+			chessColor: board[row][column]?.chessPiece?.chessColor,
+			chessPieceType: board[row][column]?.chessPiece?.chessPieceType,
+		});
+	}
+
+	function visualizeLegalMovesForPieceAt(coordinates: ChessCoordinate) {
+		const { row, column } = coordinates;
+
+		setPointShapes([]);
+		legalMoves.forEach((move) => {
+			const playedMove = move.playedPieceMove;
+
+			const from = playedMove.from;
+			const to = playedMove.to;
+
+			if (from.row === row && from.column === column) {
+				setPointShapes((shapes) => [
+					...shapes,
+					{ row: to.row, column: to.column },
+				]);
+			}
+		});
 	}
 
 	return (
