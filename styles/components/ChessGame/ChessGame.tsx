@@ -35,9 +35,6 @@ const ChessGame = ({
 		if (game) {
 			setBoard(game?.board?.board);
 			setLegalMoves(game?.legalMovesForCurrentPlayer);
-
-			console.log("Legal Moves:");
-			console.log(game?.legalMovesForCurrentPlayer);
 		}
 	}, [game]);
 
@@ -45,12 +42,6 @@ const ChessGame = ({
 	function getChessMoveCallback(chessMove: PlayedChessMoveResponse) {
 		const chessMoveElement = document.createElement("div");
 		chessMoveElement.innerHTML = `<p>${chessMove.currentPlayerUsername}</p>`;
-
-		const mainElement = document.getElementById("stomp-table");
-
-		if (mainElement) {
-			mainElement.appendChild(chessMoveElement);
-		}
 
 		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
 
@@ -66,9 +57,6 @@ const ChessGame = ({
 				return newBoard;
 			});
 		}
-
-		console.log("New Legal Moves:");
-		console.log(chessMove.legalMovesForCurrentPlayer);
 	}
 
 	function sendChessMove(coordinates: {
