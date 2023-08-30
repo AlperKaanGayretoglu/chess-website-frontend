@@ -1,5 +1,6 @@
+import { ChessCoordinate, ChessSquareResponse } from "../../../../data/api";
+
 import { GetServerSidePropsContext } from "next";
-import { ChessSquareResponse } from "../../../../data/api";
 import { redirectUser } from "../../../../utils/checkUser";
 import ChessPiece from "./ChessPiece";
 
@@ -8,17 +9,19 @@ const ChessPieces = ({
 	left,
 	top,
 	size,
+	ghostLikePiece,
 }: {
 	board: ChessSquareResponse[][];
 	left: number;
 	top: number;
 	size: number;
+	ghostLikePiece: ChessCoordinate;
 }) => {
 	const flattenedBoard = board?.flat();
 
 	return (
 		<div>
-			{flattenedBoard.map((square: ChessSquareResponse, index: number) => {
+			{flattenedBoard?.map((square: ChessSquareResponse, index: number) => {
 				if (square?.chessPiece) {
 					const rowIndex = Math.floor(index / 8);
 					const columnIndex = index % 8;
@@ -33,6 +36,10 @@ const ChessPieces = ({
 								y: top + rowIndex * (size / 8),
 							}}
 							size={size / 8}
+							isGhostLike={
+								ghostLikePiece?.row === rowIndex &&
+								ghostLikePiece?.column === columnIndex
+							}
 						/>
 					);
 				}
