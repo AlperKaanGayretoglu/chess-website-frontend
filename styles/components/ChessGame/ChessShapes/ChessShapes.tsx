@@ -11,13 +11,16 @@ import PointShape from "./PointShape";
 import SquareShape from "./SquareShape";
 
 const ChessShapes = ({
-	pointShapes,
-	squareShapes,
-	ghostPiece,
 	left,
 	top,
 	size,
+	pointShapes,
+	squareShapes,
+	ghostPiece,
 }: {
+	left: number;
+	top: number;
+	size: number;
 	pointShapes: ChessCoordinate[];
 	squareShapes: ChessCoordinate[];
 	ghostPiece: {
@@ -26,9 +29,6 @@ const ChessShapes = ({
 		chessColor: ChessColor;
 		chessPieceType: ChessPieceType;
 	};
-	left: number;
-	top: number;
-	size: number;
 }) => {
 	return (
 		<div>

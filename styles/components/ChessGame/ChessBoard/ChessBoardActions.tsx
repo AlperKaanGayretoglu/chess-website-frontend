@@ -250,18 +250,16 @@ export default function getChessBoardActions(
 
 	return {
 		// ------------------------------ STATES ------------------------------
+		// SHAPE STATES
+		pointShapes,
+		squareShapes,
+		// GHOST STATE
+		ghostPiece,
+		ghostLikePiece,
+		// BOARD STATES
 		left,
 		top,
 		size,
-
-		pointShapes,
-		squareShapes,
-
-		ghostPiece,
-		ghostLikePiece,
-
-		selectedCoordinates,
-
 		// ------------------------------ EVENT HANDLERS ------------------------------
 		handleResize,
 		handleClick,

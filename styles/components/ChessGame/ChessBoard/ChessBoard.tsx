@@ -56,18 +56,18 @@ const ChessBoard = ({
 		<div {...eventListeners}>
 			<ChessBoardImage onResize={handleResize} />
 			<ChessShapes
+				left={left}
+				top={top}
+				size={size}
 				pointShapes={pointShapes}
 				squareShapes={squareShapes}
 				ghostPiece={ghostPiece}
-				left={left}
-				top={top}
-				size={size}
 			/>
 			<ChessPieces
-				board={board}
 				left={left}
 				top={top}
 				size={size}
+				board={board}
 				ghostLikePiece={ghostLikePiece}
 			/>
 		</div>

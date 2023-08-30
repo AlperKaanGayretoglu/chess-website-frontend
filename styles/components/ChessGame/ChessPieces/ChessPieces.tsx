@@ -5,16 +5,16 @@ import { redirectUser } from "../../../../utils/checkUser";
 import ChessPiece from "./ChessPiece";
 
 const ChessPieces = ({
-	board,
 	left,
 	top,
 	size,
+	board,
 	ghostLikePiece,
 }: {
-	board: ChessSquareResponse[][];
 	left: number;
 	top: number;
 	size: number;
+	board: ChessSquareResponse[][];
 	ghostLikePiece: ChessCoordinate;
 }) => {
 	const flattenedBoard = board?.flat();
