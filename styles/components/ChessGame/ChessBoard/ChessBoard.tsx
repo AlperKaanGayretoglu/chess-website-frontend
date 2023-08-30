@@ -4,15 +4,15 @@ import {
 	ChessMoveResponse,
 	ChessPieceType,
 	ChessSquareResponse,
-} from "../../../data/api";
+} from "../../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
 import { useState } from "react";
-import ChessBoardImage from "../../../images/chess/board/ChessBoardImage";
-import { redirectUser } from "../../../utils/checkUser";
-import { Title } from "../../layouts/Default/Default.style";
-import ChessPieces from "./ChessPieces/ChessPieces";
-import ChessShapes from "./ChessShapes/ChessShapes";
+import ChessBoardImage from "../../../../images/chess/board/ChessBoardImage";
+import { redirectUser } from "../../../../utils/checkUser";
+import { Title } from "../../../layouts/Default/Default.style";
+import ChessPieces from "../ChessPieces/ChessPieces";
+import ChessShapes from "../ChessShapes/ChessShapes";
 
 const ChessBoard = ({
 	board,

@@ -10,7 +10,7 @@ import { useChessGame } from "../../../data/useChessGame";
 import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
 import { showErrorToast } from "../../../utils/promiseToast";
-import ChessBoard from "./ChessBoard";
+import ChessBoard from "./ChessBoard/ChessBoard";
 
 const ChessGame = ({
 	gameId,
