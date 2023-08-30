@@ -1,24 +1,40 @@
+import {
+	ChessColor,
+	ChessCoordinate,
+	ChessPieceType,
+} from "../../../../data/api";
+
 import { GetServerSidePropsContext } from "next";
-import { ChessCoordinate } from "../../../../data/api";
 import { redirectUser } from "../../../../utils/checkUser";
-import ChessShape from "./ChessShape";
+import GhostPiece from "./GhostPiece";
+import PointShape from "./PointShape";
+import SquareShape from "./SquareShape";
 
 const ChessShapes = ({
-	shapes,
+	pointShapes,
+	squareShapes,
+	ghostPiece,
 	left,
 	top,
 	size,
 }: {
-	shapes: ChessCoordinate[];
+	pointShapes: ChessCoordinate[];
+	squareShapes: ChessCoordinate[];
+	ghostPiece: {
+		x: number;
+		y: number;
+		chessColor: ChessColor;
+		chessPieceType: ChessPieceType;
+	};
 	left: number;
 	top: number;
 	size: number;
 }) => {
 	return (
 		<div>
-			{shapes.map((shape: ChessCoordinate, index: number) => {
+			{squareShapes.map((shape: ChessCoordinate, index: number) => {
 				return (
-					<ChessShape
+					<SquareShape
 						key={index}
 						pixelCoordinates={{
 							x: left + shape.column * (size / 8),
@@ -28,6 +44,29 @@ const ChessShapes = ({
 					/>
 				);
 			})}
+			{pointShapes.map((shape: ChessCoordinate, index: number) => {
+				return (
+					<PointShape
+						key={index}
+						pixelCoordinates={{
+							x: left + shape.column * (size / 8),
+							y: top + shape.row * (size / 8),
+						}}
+						size={size / 8}
+					/>
+				);
+			})}
+			{ghostPiece && (
+				<GhostPiece
+					chessColor={ghostPiece.chessColor}
+					chessPieceType={ghostPiece.chessPieceType}
+					pixelCoordinates={{
+						x: ghostPiece.x - size / 16,
+						y: ghostPiece.y - size / 16,
+					}}
+					size={size / 8}
+				/>
+			)}
 		</div>
 	);
 };
