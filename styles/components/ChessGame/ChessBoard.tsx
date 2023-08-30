@@ -1,4 +1,10 @@
-import { ChessCoordinate, ChessSquareResponse } from "../../../data/api";
+import {
+	ChessColor,
+	ChessCoordinate,
+	ChessMoveResponse,
+	ChessPieceType,
+	ChessSquareResponse,
+} from "../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
 import { useState } from "react";
@@ -10,10 +16,12 @@ import ChessShapes from "./ChessShapes/ChessShapes";
 
 const ChessBoard = ({
 	board,
+	legalMoves,
 	isInGame,
 	sendChessMove,
 }: {
 	board: ChessSquareResponse[][];
+	legalMoves: ChessMoveResponse[];
 	isInGame: boolean;
 	sendChessMove: (chessMove: {
 		fromRow: number;
@@ -26,7 +34,15 @@ const ChessBoard = ({
 	const [top, setTop] = useState(0);
 	const [size, setSize] = useState(0);
 
-	const [shapes, setShapes] = useState<ChessCoordinate[]>([]);
+	const [pointShapes, setPointShapes] = useState<ChessCoordinate[]>([]);
+	const [squareShapes, setSquareShapes] = useState<ChessCoordinate[]>([]);
+	const [ghostPiece, setGhostPiece] = useState<{
+		x: number;
+		y: number;
+		chessColor: ChessColor;
+		chessPieceType: ChessPieceType;
+	}>(null);
+	const [ghostLikePiece, setGhostLikePiece] = useState<ChessCoordinate>(null);
 
 	const [selectedCoordinates, setSelectedCoordinates] = useState<{
 		row: number;
@@ -56,14 +72,26 @@ const ChessBoard = ({
 		}
 
 		const x = event.clientX;
-		const y = event.clientY;
+		const y = event.clientY + window.scrollY;
 		const row = Math.floor((y - top) / (size / 8));
 		const column = Math.floor((x - left) / (size / 8));
 
 		if (!selectedCoordinates) {
 			if (board[row][column]?.chessPiece) {
 				setSelectedCoordinates({ row, column });
-				setShapes([{ row, column }]);
+				setSquareShapes([{ row, column }]);
+				setPointShapes([]);
+				legalMoves.forEach((move) => {
+					const playedMove = move.playedPieceMove;
+					const from = playedMove.from;
+					const to = playedMove.to;
+					if (from.row === row && from.column === column) {
+						setPointShapes((shapes) => [
+							...shapes,
+							{ row: to.row, column: to.column },
+						]);
+					}
+				});
 			}
 		} else {
 			if (
@@ -74,7 +102,9 @@ const ChessBoard = ({
 						?.chessColor
 			) {
 				setSelectedCoordinates(null);
-				setShapes([]);
+				setSquareShapes([]);
+				setPointShapes([]);
+				setGhostLikePiece(null);
 				return;
 			}
 			const chessMove = {
@@ -84,7 +114,9 @@ const ChessBoard = ({
 				toColumn: column,
 			};
 			setSelectedCoordinates(null);
-			setShapes([]);
+			setSquareShapes([]);
+			setPointShapes([]);
+			setGhostLikePiece(null);
 			sendChessMove(chessMove);
 		}
 	}
@@ -105,7 +137,7 @@ const ChessBoard = ({
 		}
 
 		const x = event.clientX;
-		const y = event.clientY;
+		const y = event.clientY + window.scrollY;
 
 		const row = Math.floor((y - top) / (size / 8));
 		const column = Math.floor((x - left) / (size / 8));
@@ -115,24 +147,60 @@ const ChessBoard = ({
 				return;
 			}
 			setSelectedCoordinates(null);
-			setShapes([]);
+			setSquareShapes([]);
+			setPointShapes([]);
+			legalMoves.forEach((move) => {
+				const playedMove = move.playedPieceMove;
+				const from = playedMove.from;
+				const to = playedMove.to;
+				if (from.row === row && from.column === column) {
+					setPointShapes((shapes) => [
+						...shapes,
+						{ row: to.row, column: to.column },
+					]);
+					setGhostLikePiece({ row, column });
+					setSquareShapes([{ row, column }]);
+				}
+			});
 			setIsDragging(true);
 			setStartCoordinates({ row, column });
+		} else {
+			setGhostPiece({
+				x: x,
+				y: y,
+				chessColor:
+					board[startCoordinates.row][startCoordinates.column].chessPiece
+						.chessColor,
+				chessPieceType:
+					board[startCoordinates.row][startCoordinates.column].chessPiece
+						.chessPieceType,
+			});
 		}
 	}
 
 	function handleMouseUp(event: { clientX: number; clientY: number }) {
 		setIsMouseDown(false);
+		setGhostLikePiece(null);
 
 		if (!isDragging) {
 			return;
 		}
 
 		const x = event.clientX;
-		const y = event.clientY;
+		const y = event.clientY + window.scrollY;
 
 		const row = Math.floor((y - top) / (size / 8));
 		const column = Math.floor((x - left) / (size / 8));
+
+		if (startCoordinates.row === row && startCoordinates.column === column) {
+			setIsDragging(false);
+			setStartCoordinates(null);
+			setPointShapes([]);
+			setSquareShapes([]);
+			setGhostLikePiece(null);
+			setGhostPiece(null);
+			return;
+		}
 
 		const chessMove = {
 			fromRow: startCoordinates.row,
@@ -143,6 +211,9 @@ const ChessBoard = ({
 
 		setIsDragging(false);
 		setStartCoordinates(null);
+		setPointShapes([]);
+		setSquareShapes([]);
+		setGhostPiece(null);
 
 		sendChessMove(chessMove);
 	}
@@ -158,8 +229,21 @@ const ChessBoard = ({
 						onMouseMove={handleMouseMove}
 					>
 						<ChessBoardImage onResize={handleResize} />
-						<ChessShapes shapes={shapes} left={left} top={top} size={size} />
-						<ChessPieces board={board} left={left} top={top} size={size} />
+						<ChessShapes
+							pointShapes={pointShapes}
+							squareShapes={squareShapes}
+							ghostPiece={ghostPiece}
+							left={left}
+							top={top}
+							size={size}
+						/>
+						<ChessPieces
+							board={board}
+							left={left}
+							top={top}
+							size={size}
+							ghostLikePiece={ghostLikePiece}
+						/>
 					</div>
 					<Title>Send Move</Title>
 					<div id="stomp-table"></div>
@@ -168,8 +252,21 @@ const ChessBoard = ({
 				<div>
 					<div>
 						<ChessBoardImage onResize={handleResize} />
-						<ChessShapes shapes={shapes} left={left} top={top} size={size} />
-						<ChessPieces board={board} left={left} top={top} size={size} />
+						<ChessShapes
+							pointShapes={pointShapes}
+							squareShapes={squareShapes}
+							ghostPiece={ghostPiece}
+							left={left}
+							top={top}
+							size={size}
+						/>
+						<ChessPieces
+							board={board}
+							left={left}
+							top={top}
+							size={size}
+							ghostLikePiece={ghostLikePiece}
+						/>
 					</div>
 					<Title>Send Move</Title>
 					<div id="stomp-table"></div>
