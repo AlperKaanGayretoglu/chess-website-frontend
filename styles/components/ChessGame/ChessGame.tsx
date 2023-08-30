@@ -52,10 +52,23 @@ const ChessGame = ({
 			mainElement.appendChild(chessMoveElement);
 		}
 
+		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
+
+		if (chessMove.currentPlayerUsername === username) {
+			const playedMove = chessMove.playedChessMove;
+			const from = playedMove.playedPieceMove.from;
+			const to = playedMove.playedPieceMove.to;
+
+			setBoard((board) => {
+				const newBoard = [...board];
+				newBoard[to.row][to.column] = newBoard[from.row][from.column];
+				newBoard[from.row][from.column] = null;
+				return newBoard;
+			});
+		}
+
 		console.log("New Legal Moves:");
 		console.log(chessMove.legalMovesForCurrentPlayer);
-
-		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
 	}
 
 	function sendChessMove(coordinates: {
@@ -101,6 +114,7 @@ const ChessGame = ({
 		<div>
 			<ChessBoard
 				board={board}
+				legalMoves={legalMoves}
 				isInGame={isInGame}
 				sendChessMove={sendChessMove}
 			/>
