@@ -25,7 +25,7 @@ export default function ChessBoardImage({ onResize }) {
 	}, [onResize]);
 
 	return (
-		<div ref={elementRef} style={{ width: "750px", height: "750px" }}>
+		<div ref={elementRef} style={{ width: "700px", height: "700px" }}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				xmlnsXlink="http://www.w3.org/1999/xlink"
