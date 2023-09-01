@@ -2,14 +2,16 @@ import {
 	ChessColor,
 	ChessCoordinate,
 	ChessMoveResponse,
+	ChessPieceResponse,
 	ChessPieceType,
-	ChessSquareResponse,
+	fromChessCoordinateToString,
 } from "../../../../data/api";
 
 import { useState } from "react";
 
 export default function getChessBoardActions(
-	board: ChessSquareResponse[][],
+	playerColor: ChessColor,
+	board: Map<string, ChessPieceResponse>,
 	legalMoves: ChessMoveResponse[],
 	sendChessMove: (chessMove: {
 		fromRow: number;
@@ -112,7 +114,7 @@ export default function getChessBoardActions(
 
 	// ------------------------------ PIECE MOVEMENTS ------------------------------
 	function selectPieceAt(coordinates: ChessCoordinate) {
-		if (board[coordinates.row][coordinates.column]?.chessPiece) {
+		if (doesChessPieceExistsAtAndIsMyColor(coordinates)) {
 			setSelectedCoordinates(coordinates);
 			setSquareShapes([coordinates]);
 
@@ -124,7 +126,7 @@ export default function getChessBoardActions(
 		event: { clientX: number; clientY: number },
 		coordinates: ChessCoordinate
 	) {
-		if (!board[coordinates.row][coordinates.column]?.chessPiece) {
+		if (!doesChessPieceExistsAtAndIsMyColor(coordinates)) {
 			return;
 		}
 
@@ -185,10 +187,7 @@ export default function getChessBoardActions(
 		const isOnSameSquare =
 			selectedCoordinates.row === row && selectedCoordinates.column === column;
 
-		const isOnSameColorPiece =
-			board[row][column]?.chessPiece?.chessColor ===
-			board[selectedCoordinates.row][selectedCoordinates.column]?.chessPiece
-				?.chessColor;
+		const isOnSameColorPiece = doesChessPieceExistsAtAndIsMyColor(coordinates);
 
 		dropPiece();
 
@@ -198,6 +197,15 @@ export default function getChessBoardActions(
 	}
 
 	// ------------------------------ UTILS ------------------------------
+	function getChessPieceAt(coordinates: ChessCoordinate) {
+		return board.get(fromChessCoordinateToString(coordinates));
+	}
+
+	function doesChessPieceExistsAtAndIsMyColor(coordinates: ChessCoordinate) {
+		const chessPiece = getChessPieceAt(coordinates);
+		return chessPiece && chessPiece.chessColor === playerColor;
+	}
+
 	function getChessCoordinateFromMousePosition(event: {
 		clientX: number;
 		clientY: number;
@@ -218,14 +226,13 @@ export default function getChessBoardActions(
 		const x = event.clientX;
 		const y = event.clientY + window.scrollY;
 
-		const row = coordinates.row;
-		const column = coordinates.column;
+		const stringCoordinates = fromChessCoordinateToString(coordinates);
 
 		setGhostPiece({
 			x: x,
 			y: y,
-			chessColor: board[row][column]?.chessPiece?.chessColor,
-			chessPieceType: board[row][column]?.chessPiece?.chessPieceType,
+			chessColor: board.get(stringCoordinates)?.chessColor,
+			chessPieceType: board.get(stringCoordinates)?.chessPieceType,
 		});
 	}
 

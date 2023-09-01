@@ -33,12 +33,7 @@ export type ChessGameResponse = {
 };
 
 export type ChessBoardResponse = {
-	board: ChessSquareResponse[][];
-};
-
-export type ChessSquareResponse = {
-	chessColor: ChessColor;
-	chessPiece: ChessPieceResponse;
+	board: Map<string, ChessPieceResponse>;
 };
 
 export type ChessPieceResponse = {
@@ -94,3 +89,20 @@ export type ChessCoordinate = {
 	row: number;
 	column: number;
 };
+
+export function fromStringToChessCoordinate(
+	coordinate: string
+): ChessCoordinate {
+	const rowMatch = coordinate.match(/row=(\d+)/);
+	const columnMatch = coordinate.match(/column=(\d+)/);
+	return {
+		row: rowMatch ? parseInt(rowMatch[1]) : 0,
+		column: columnMatch ? parseInt(columnMatch[1]) : 0,
+	};
+}
+
+export function fromChessCoordinateToString(
+	coordinate: ChessCoordinate
+): string {
+	return `row=${coordinate.row},column=${coordinate.column}`;
+}

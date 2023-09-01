@@ -1,4 +1,8 @@
-import { ChessMoveResponse, ChessSquareResponse } from "../../../../data/api";
+import {
+	ChessColor,
+	ChessMoveResponse,
+	ChessPieceResponse,
+} from "../../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
 import ChessBoardImage from "../../../../images/chess/board/ChessBoardImage";
@@ -11,11 +15,15 @@ const ChessBoard = ({
 	board,
 	legalMoves,
 	isInGame,
+	isMyTurn,
+	playerColor,
 	sendChessMove,
 }: {
-	board: ChessSquareResponse[][];
+	board: Map<string, ChessPieceResponse>;
 	legalMoves: ChessMoveResponse[];
 	isInGame: boolean;
+	isMyTurn: boolean;
+	playerColor: ChessColor;
 	sendChessMove: (chessMove: {
 		fromRow: number;
 		fromColumn: number;
@@ -41,16 +49,17 @@ const ChessBoard = ({
 		handleMouseUp,
 		handleMouseMove,
 		handleResize,
-	} = getChessBoardActions(board, legalMoves, sendChessMove);
+	} = getChessBoardActions(playerColor, board, legalMoves, sendChessMove);
 
-	const eventListeners = isInGame
-		? {
-				onClick: handleClick,
-				onMouseDown: handleMouseDown,
-				onMouseUp: handleMouseUp,
-				onMouseMove: handleMouseMove,
-		  }
-		: {};
+	const eventListeners =
+		isInGame && isMyTurn
+			? {
+					onClick: handleClick,
+					onMouseDown: handleMouseDown,
+					onMouseUp: handleMouseUp,
+					onMouseMove: handleMouseMove,
+			  }
+			: {};
 
 	return (
 		<div {...eventListeners}>

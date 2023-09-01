@@ -1,4 +1,8 @@
-import { ChessCoordinate, ChessSquareResponse } from "../../../../data/api";
+import {
+	ChessCoordinate,
+	ChessPieceResponse,
+	fromStringToChessCoordinate,
+} from "../../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
 import { redirectUser } from "../../../../utils/checkUser";
@@ -14,35 +18,34 @@ const ChessPieces = ({
 	left: number;
 	top: number;
 	size: number;
-	board: ChessSquareResponse[][];
+	board: Map<string, ChessPieceResponse>;
 	ghostLikePiece: ChessCoordinate;
 }) => {
-	const flattenedBoard = board?.flat();
-
 	return (
 		<div>
-			{flattenedBoard?.map((square: ChessSquareResponse, index: number) => {
-				if (square?.chessPiece) {
-					const rowIndex = Math.floor(index / 8);
-					const columnIndex = index % 8;
+			{Array.from(board?.entries()).map(([coordinate, chessPiece]) => {
+				const chessCoordinate = fromStringToChessCoordinate(coordinate);
 
-					return (
-						<ChessPiece
-							key={index}
-							chessColor={square?.chessPiece?.chessColor}
-							chessPieceType={square?.chessPiece?.chessPieceType}
-							pixelCoordinates={{
-								x: left + columnIndex * (size / 8),
-								y: top + rowIndex * (size / 8),
-							}}
-							size={size / 8}
-							isGhostLike={
-								ghostLikePiece?.row === rowIndex &&
-								ghostLikePiece?.column === columnIndex
-							}
-						/>
-					);
-				}
+				const rowIndex = chessCoordinate.row;
+				const columnIndex = chessCoordinate.column;
+
+				const key = (rowIndex << 3) | columnIndex;
+				return (
+					<ChessPiece
+						key={key}
+						chessColor={chessPiece.chessColor}
+						chessPieceType={chessPiece.chessPieceType}
+						pixelCoordinates={{
+							x: left + columnIndex * (size / 8),
+							y: top + rowIndex * (size / 8),
+						}}
+						size={size / 8}
+						isGhostLike={
+							ghostLikePiece?.row === rowIndex &&
+							ghostLikePiece?.column === columnIndex
+						}
+					/>
+				);
 			})}
 		</div>
 	);

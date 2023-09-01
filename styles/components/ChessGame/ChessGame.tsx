@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import {
+	ChessColor,
 	ChessMoveResponse,
-	ChessSquareResponse,
+	ChessPieceResponse,
 	PlayedChessMoveResponse,
+	fromChessCoordinateToString,
 } from "../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
@@ -26,8 +28,17 @@ const ChessGame = ({
 	const isInGame =
 		game?.playerBlackUsername === username ||
 		game?.playerWhiteUsername === username;
+	let playerColor = !isInGame
+		? null
+		: game?.playerWhiteUsername === username
+		? ChessColor.WHITE
+		: ChessColor.BLACK;
 
-	const [board, setBoard] = useState<ChessSquareResponse[][]>([]);
+	const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
+
+	const [board, setBoard] = useState<Map<string, ChessPieceResponse>>(
+		new Map()
+	);
 
 	const [legalMoves, setLegalMoves] = useState<ChessMoveResponse[]>([]);
 
@@ -35,6 +46,7 @@ const ChessGame = ({
 		if (game) {
 			setBoard(game?.board?.board);
 			setLegalMoves(game?.legalMovesForCurrentPlayer);
+			setIsMyTurn(game?.currentPlayerUsername === username);
 		}
 	}, [game]);
 
@@ -43,17 +55,18 @@ const ChessGame = ({
 		const chessMoveElement = document.createElement("div");
 		chessMoveElement.innerHTML = `<p>${chessMove.currentPlayerUsername}</p>`;
 
-		setLegalMoves(chessMove.legalMovesForCurrentPlayer);
-
 		if (chessMove.currentPlayerUsername === username) {
+			setIsMyTurn(true);
+			setLegalMoves(chessMove.legalMovesForCurrentPlayer);
+
 			const playedMove = chessMove.playedChessMove;
-			const from = playedMove.playedPieceMove.from;
-			const to = playedMove.playedPieceMove.to;
+			const from = fromChessCoordinateToString(playedMove.playedPieceMove.from);
+			const to = fromChessCoordinateToString(playedMove.playedPieceMove.to);
 
 			setBoard((board) => {
-				const newBoard = [...board];
-				newBoard[to.row][to.column] = newBoard[from.row][from.column];
-				newBoard[from.row][from.column] = null;
+				const newBoard = new Map(board);
+				newBoard.set(to, newBoard.get(from));
+				newBoard.delete(from);
 				return newBoard;
 			});
 		}
@@ -82,13 +95,15 @@ const ChessGame = ({
 			return;
 		}
 
-		const from = move.playedPieceMove.from;
-		const to = move.playedPieceMove.to;
+		setIsMyTurn(false);
+
+		const from = fromChessCoordinateToString(move.playedPieceMove.from);
+		const to = fromChessCoordinateToString(move.playedPieceMove.to);
 
 		setBoard((board) => {
-			const newBoard = [...board];
-			newBoard[to.row][to.column] = newBoard[from.row][from.column];
-			newBoard[from.row][from.column] = null;
+			const newBoard = new Map(board);
+			newBoard.set(to, newBoard.get(from));
+			newBoard.delete(from);
 			return newBoard;
 		});
 
@@ -104,6 +119,8 @@ const ChessGame = ({
 				board={board}
 				legalMoves={legalMoves}
 				isInGame={isInGame}
+				isMyTurn={isMyTurn}
+				playerColor={playerColor}
 				sendChessMove={sendChessMove}
 			/>
 		</div>
