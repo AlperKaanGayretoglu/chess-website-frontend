@@ -12,6 +12,7 @@ import { useChessGame } from "../../../data/useChessGame";
 import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
 import { showErrorToast } from "../../../utils/promiseToast";
+import StopWatch from "../Stopwatch/Stopwatch";
 import ChessBoard from "./ChessBoard/ChessBoard";
 
 const ChessGame = ({
@@ -21,6 +22,9 @@ const ChessGame = ({
 	gameId: string;
 	username: string;
 }) => {
+	// TODO: Remove after testing
+	const { time, handleStart, handlePause, handleReset } = StopWatch();
+
 	const chessMoveSocket = useChessMoveSocket(gameId, getChessMoveCallback).data
 		.chessMoveSocket;
 
@@ -52,6 +56,7 @@ const ChessGame = ({
 
 	// Do this when a chessMove is received
 	function getChessMoveCallback(chessMove: PlayedChessMoveResponse) {
+		handlePause();
 		const chessMoveElement = document.createElement("div");
 		chessMoveElement.innerHTML = `<p>${chessMove.currentPlayerUsername}</p>`;
 
@@ -78,6 +83,8 @@ const ChessGame = ({
 		toRow: number;
 		toColumn: number;
 	}) {
+		handleReset();
+		handleStart();
 		const move = legalMoves.find((move) => {
 			const playedMove = move.playedPieceMove;
 			const from = playedMove.from;
@@ -114,16 +121,23 @@ const ChessGame = ({
 	}
 
 	return (
-		<div>
-			<ChessBoard
-				board={board}
-				legalMoves={legalMoves}
-				isInGame={isInGame}
-				isMyTurn={isMyTurn}
-				playerColor={playerColor}
-				sendChessMove={sendChessMove}
-			/>
-		</div>
+		<>
+			<div>
+				<span>{Math.floor((time / 1000) % 60)}.</span>
+				<span>{("0" + ((time / 10) % 100)).slice(-2)}</span>
+			</div>
+			<br></br>
+			<div>
+				<ChessBoard
+					board={board}
+					legalMoves={legalMoves}
+					isInGame={isInGame}
+					isMyTurn={isMyTurn}
+					playerColor={playerColor}
+					sendChessMove={sendChessMove}
+				/>
+			</div>
+		</>
 	);
 };
 
