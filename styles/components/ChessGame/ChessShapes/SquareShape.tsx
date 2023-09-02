@@ -4,12 +4,14 @@ import { redirectUser } from "../../../../utils/checkUser";
 const SquareShape = ({
 	pixelCoordinates,
 	size,
+	isLight = false,
 }: {
 	pixelCoordinates: {
 		x: number;
 		y: number;
 	};
 	size: number;
+	isLight?: boolean;
 }) => {
 	return (
 		<div
@@ -20,7 +22,9 @@ const SquareShape = ({
 				width: size + 2,
 				height: size + 2,
 				cursor: "pointer",
-				backgroundColor: "rgba(0, 143, 24, 0.747)",
+				backgroundColor: isLight
+					? "rgba(0, 139, 23, 0.541)"
+					: "rgba(0, 102, 17, 0.541)",
 			}}
 		></div>
 	);

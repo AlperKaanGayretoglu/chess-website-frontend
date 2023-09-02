@@ -32,7 +32,7 @@ const SemiSquareShape = ({
 			<rect
 				width="100%"
 				height="100%"
-				fill="rgba(0, 102, 17, 0.507)"
+				fill="rgba(0, 102, 17, 0.541)"
 				mask="url(#squareWithHoleMask)"
 			/>
 		</svg>

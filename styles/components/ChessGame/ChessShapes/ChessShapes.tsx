@@ -18,6 +18,7 @@ const ChessShapes = ({
 	pointShapes,
 	squareShapes,
 	semiSquareShapes,
+	ghostSquareShapes,
 	ghostPiece,
 }: {
 	left: number;
@@ -26,6 +27,7 @@ const ChessShapes = ({
 	pointShapes: ChessCoordinate[];
 	squareShapes: ChessCoordinate[];
 	semiSquareShapes: ChessCoordinate[];
+	ghostSquareShapes: ChessCoordinate[];
 	ghostPiece: {
 		x: number;
 		y: number;
@@ -33,6 +35,20 @@ const ChessShapes = ({
 		chessPieceType: ChessPieceType;
 	};
 }) => {
+	// TODO: If you decide there can only be 1 ghost square shape, then just retrive it instead of using an array
+	const ghostSquareShape = ghostSquareShapes[0];
+	function isCoordinatesSameAsGhostSquareShapeCoordinates(
+		coordinates: ChessCoordinate
+	) {
+		if (!ghostSquareShape) {
+			return false;
+		}
+
+		return (
+			coordinates.row === ghostSquareShape.row &&
+			coordinates.column === ghostSquareShape.column
+		);
+	}
 	return (
 		<div>
 			{squareShapes.map((shape: ChessCoordinate, index: number) => {
@@ -48,6 +64,10 @@ const ChessShapes = ({
 				);
 			})}
 			{semiSquareShapes.map((shape: ChessCoordinate, index: number) => {
+				if (isCoordinatesSameAsGhostSquareShapeCoordinates(shape)) {
+					return null;
+				}
+
 				return (
 					<SemiSquareShape
 						key={index}
@@ -60,6 +80,10 @@ const ChessShapes = ({
 				);
 			})}
 			{pointShapes.map((shape: ChessCoordinate, index: number) => {
+				if (isCoordinatesSameAsGhostSquareShapeCoordinates(shape)) {
+					return null;
+				}
+
 				return (
 					<PointShape
 						key={index}
@@ -68,6 +92,19 @@ const ChessShapes = ({
 							y: top + shape.row * (size / 8),
 						}}
 						size={size / 8}
+					/>
+				);
+			})}
+			{ghostSquareShapes.map((shape: ChessCoordinate, index: number) => {
+				return (
+					<SquareShape
+						key={index}
+						pixelCoordinates={{
+							x: left + shape.column * (size / 8),
+							y: top + shape.row * (size / 8),
+						}}
+						size={size / 8}
+						isLight={true}
 					/>
 				);
 			})}

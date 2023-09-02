@@ -33,6 +33,9 @@ export default function getChessBoardActions(
 	const [semiSquareShapes, setSemiSquareShapes] = useState<ChessCoordinate[]>(
 		[]
 	);
+	const [ghostSquareShapes, setGhostSquareShapes] = useState<ChessCoordinate[]>(
+		[]
+	);
 
 	// GHOST STATE
 	const [ghostPiece, setGhostPiece] = useState<{
@@ -91,11 +94,19 @@ export default function getChessBoardActions(
 	}) {
 		event.preventDefault();
 
-		if (!isMouseDown) {
+		if (!selectedCoordinates && !isMouseDown) {
 			return;
 		}
 
 		const coordinates = getChessCoordinateFromMousePosition(event);
+
+		if (selectedCoordinates) {
+			createGhostSquaresWhereMouseIs(coordinates);
+		}
+
+		if (!isMouseDown) {
+			return;
+		}
 
 		if (!isDragging) {
 			startDraggingFrom(event, coordinates);
@@ -103,6 +114,7 @@ export default function getChessBoardActions(
 
 		if (startCoordinates) {
 			createGhostPieceUsing(event, startCoordinates);
+			createGhostSquaresWhereMouseIs(coordinates);
 		}
 	}
 
@@ -149,6 +161,7 @@ export default function getChessBoardActions(
 	function dropPiece() {
 		setSelectedCoordinates(null);
 		setPointShapes([]);
+		setGhostSquareShapes([]);
 		setSemiSquareShapes([]);
 		setSquareShapes([]);
 
@@ -247,10 +260,33 @@ export default function getChessBoardActions(
 		});
 	}
 
+	function createGhostSquaresWhereMouseIs(coordinates: ChessCoordinate) {
+		const initialCoordinates = selectedCoordinates ?? startCoordinates;
+
+		const isOnLegalMove = legalMoves.some((move) => {
+			const playedMove = move.playedPieceMove;
+			const from = playedMove.from;
+			const to = playedMove.to;
+			return (
+				from.row === initialCoordinates.row &&
+				from.column === initialCoordinates.column &&
+				to.row === coordinates.row &&
+				to.column === coordinates.column
+			);
+		});
+
+		if (isOnLegalMove) {
+			setGhostSquareShapes([coordinates]);
+		} else {
+			setGhostSquareShapes([]);
+		}
+	}
+
 	function visualizeLegalMovesForPieceAt(coordinates: ChessCoordinate) {
 		const { row, column } = coordinates;
 
 		setPointShapes([]);
+		setGhostSquareShapes([]);
 		setSemiSquareShapes([]);
 		legalMoves.forEach((move) => {
 			const playedMove = move.playedPieceMove;
@@ -280,6 +316,7 @@ export default function getChessBoardActions(
 		pointShapes,
 		squareShapes,
 		semiSquareShapes,
+		ghostSquareShapes,
 		// GHOST STATE
 		ghostPiece,
 		ghostLikePiece,
