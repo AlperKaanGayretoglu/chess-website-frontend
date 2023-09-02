@@ -4,13 +4,13 @@ import {
 	ChessMoveResponse,
 	ChessPieceResponse,
 	PlayedChessMoveResponse,
-	fromChessCoordinateToString,
 } from "../../../data/api";
 
 import { GetServerSidePropsContext } from "next";
 import { useChessGame } from "../../../data/useChessGame";
 import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
+import { ChessBoardUpdater } from "../../../utils/chessBoardUpdater";
 import { showErrorToast } from "../../../utils/promiseToast";
 import StopWatch from "../Stopwatch/Stopwatch";
 import ChessBoard from "./ChessBoard/ChessBoard";
@@ -43,6 +43,7 @@ const ChessGame = ({
 	const [board, setBoard] = useState<Map<string, ChessPieceResponse>>(
 		new Map()
 	);
+	const chessBoardUpdater = new ChessBoardUpdater(setBoard);
 
 	const [legalMoves, setLegalMoves] = useState<ChessMoveResponse[]>([]);
 
@@ -55,25 +56,16 @@ const ChessGame = ({
 	}, [game]);
 
 	// Do this when a chessMove is received
-	function getChessMoveCallback(chessMove: PlayedChessMoveResponse) {
+	function getChessMoveCallback(chessMoveResponse: PlayedChessMoveResponse) {
 		handlePause();
 		const chessMoveElement = document.createElement("div");
-		chessMoveElement.innerHTML = `<p>${chessMove.currentPlayerUsername}</p>`;
+		chessMoveElement.innerHTML = `<p>${chessMoveResponse.currentPlayerUsername}</p>`;
 
-		if (chessMove.currentPlayerUsername === username) {
+		if (chessMoveResponse.currentPlayerUsername === username) {
 			setIsMyTurn(true);
-			setLegalMoves(chessMove.legalMovesForCurrentPlayer);
+			setLegalMoves(chessMoveResponse.legalMovesForCurrentPlayer);
 
-			const playedMove = chessMove.playedChessMove;
-			const from = fromChessCoordinateToString(playedMove.playedPieceMove.from);
-			const to = fromChessCoordinateToString(playedMove.playedPieceMove.to);
-
-			setBoard((board) => {
-				const newBoard = new Map(board);
-				newBoard.set(to, newBoard.get(from));
-				newBoard.delete(from);
-				return newBoard;
-			});
+			chessBoardUpdater.executeChessMove(chessMoveResponse.playedChessMove);
 		}
 	}
 
@@ -103,16 +95,7 @@ const ChessGame = ({
 		}
 
 		setIsMyTurn(false);
-
-		const from = fromChessCoordinateToString(move.playedPieceMove.from);
-		const to = fromChessCoordinateToString(move.playedPieceMove.to);
-
-		setBoard((board) => {
-			const newBoard = new Map(board);
-			newBoard.set(to, newBoard.get(from));
-			newBoard.delete(from);
-			return newBoard;
-		});
+		chessBoardUpdater.executeChessMove(move);
 
 		chessMoveSocket.sendMessage({
 			username: username as string,

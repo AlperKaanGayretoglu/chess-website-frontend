@@ -2,6 +2,7 @@ import {
 	ChessColor,
 	ChessCoordinate,
 	ChessMoveResponse,
+	ChessMoveType,
 	ChessPieceResponse,
 	ChessPieceType,
 	fromChessCoordinateToString,
@@ -29,6 +30,9 @@ export default function getChessBoardActions(
 	// SHAPE STATES
 	const [pointShapes, setPointShapes] = useState<ChessCoordinate[]>([]);
 	const [squareShapes, setSquareShapes] = useState<ChessCoordinate[]>([]);
+	const [semiSquareShapes, setSemiSquareShapes] = useState<ChessCoordinate[]>(
+		[]
+	);
 
 	// GHOST STATE
 	const [ghostPiece, setGhostPiece] = useState<{
@@ -145,6 +149,7 @@ export default function getChessBoardActions(
 	function dropPiece() {
 		setSelectedCoordinates(null);
 		setPointShapes([]);
+		setSemiSquareShapes([]);
 		setSquareShapes([]);
 
 		setIsDragging(false);
@@ -240,6 +245,7 @@ export default function getChessBoardActions(
 		const { row, column } = coordinates;
 
 		setPointShapes([]);
+		setSemiSquareShapes([]);
 		legalMoves.forEach((move) => {
 			const playedMove = move.playedPieceMove;
 
@@ -247,10 +253,17 @@ export default function getChessBoardActions(
 			const to = playedMove.to;
 
 			if (from.row === row && from.column === column) {
-				setPointShapes((shapes) => [
-					...shapes,
-					{ row: to.row, column: to.column },
-				]);
+				if (move.moveType === ChessMoveType.NORMAL_PIECE_CAPTURE) {
+					setSemiSquareShapes((shapes) => [
+						...shapes,
+						{ row: to.row, column: to.column },
+					]);
+				} else {
+					setPointShapes((shapes) => [
+						...shapes,
+						{ row: to.row, column: to.column },
+					]);
+				}
 			}
 		});
 	}
@@ -260,6 +273,7 @@ export default function getChessBoardActions(
 		// SHAPE STATES
 		pointShapes,
 		squareShapes,
+		semiSquareShapes,
 		// GHOST STATE
 		ghostPiece,
 		ghostLikePiece,

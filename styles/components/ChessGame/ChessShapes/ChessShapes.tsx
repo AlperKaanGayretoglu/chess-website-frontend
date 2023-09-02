@@ -8,6 +8,7 @@ import { GetServerSidePropsContext } from "next";
 import { redirectUser } from "../../../../utils/checkUser";
 import GhostPiece from "./GhostPiece";
 import PointShape from "./PointShape";
+import SemiSquareShape from "./SemiSquareShape";
 import SquareShape from "./SquareShape";
 
 const ChessShapes = ({
@@ -16,6 +17,7 @@ const ChessShapes = ({
 	size,
 	pointShapes,
 	squareShapes,
+	semiSquareShapes,
 	ghostPiece,
 }: {
 	left: number;
@@ -23,6 +25,7 @@ const ChessShapes = ({
 	size: number;
 	pointShapes: ChessCoordinate[];
 	squareShapes: ChessCoordinate[];
+	semiSquareShapes: ChessCoordinate[];
 	ghostPiece: {
 		x: number;
 		y: number;
@@ -35,6 +38,18 @@ const ChessShapes = ({
 			{squareShapes.map((shape: ChessCoordinate, index: number) => {
 				return (
 					<SquareShape
+						key={index}
+						pixelCoordinates={{
+							x: left + shape.column * (size / 8),
+							y: top + shape.row * (size / 8),
+						}}
+						size={size / 8}
+					/>
+				);
+			})}
+			{semiSquareShapes.map((shape: ChessCoordinate, index: number) => {
+				return (
+					<SemiSquareShape
 						key={index}
 						pixelCoordinates={{
 							x: left + shape.column * (size / 8),

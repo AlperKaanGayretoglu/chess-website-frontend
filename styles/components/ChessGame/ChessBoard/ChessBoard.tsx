@@ -36,6 +36,7 @@ const ChessBoard = ({
 		// SHAPE STATES
 		pointShapes,
 		squareShapes,
+		semiSquareShapes,
 		// GHOST STATE
 		ghostPiece,
 		ghostLikePiece,
@@ -70,6 +71,7 @@ const ChessBoard = ({
 				size={size}
 				pointShapes={pointShapes}
 				squareShapes={squareShapes}
+				semiSquareShapes={semiSquareShapes}
 				ghostPiece={ghostPiece}
 			/>
 			<ChessPieces

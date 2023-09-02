@@ -77,6 +77,8 @@ export type ChessMoveResponse = {
 	id: string;
 	playedPieceMove: PieceMoveResponse;
 	triggeredPieceMoves: PieceMoveResponse[];
+	pieceCaptureMoves: PieceCaptureMoveResponse[];
+	moveType: ChessMoveType;
 };
 
 export type PieceMoveResponse = {
@@ -84,6 +86,16 @@ export type PieceMoveResponse = {
 
 	to: ChessCoordinate;
 };
+
+export type PieceCaptureMoveResponse = {
+	from: ChessCoordinate;
+};
+
+export enum ChessMoveType {
+	NORMAL_PIECE_MOVEMENT = "NORMAL_PIECE_MOVEMENT",
+	NORMAL_PIECE_CAPTURE = "NORMAL_PIECE_CAPTURE",
+	CASTLING = "CASTLING",
+}
 
 export type ChessCoordinate = {
 	row: number;
