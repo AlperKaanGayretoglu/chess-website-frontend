@@ -196,7 +196,13 @@ export default function getChessBoardActions(
 
 		dropPiece();
 
-		if (!(isOnSameSquare || isOnSameColorPiece)) {
+		if (isOnSameSquare) {
+			return;
+		}
+
+		if (isOnSameColorPiece) {
+			selectPieceAt(coordinates);
+		} else {
 			sendChessMove(chessMove);
 		}
 	}
