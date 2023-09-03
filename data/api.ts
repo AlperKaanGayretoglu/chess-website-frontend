@@ -30,6 +30,8 @@ export type ChessGameResponse = {
 	playerBlackUsername: string;
 	currentPlayerUsername: string;
 	legalMovesForCurrentPlayer: ChessMoveResponse[];
+	whiteInCheck: boolean;
+	blackInCheck: boolean;
 };
 
 export type ChessBoardResponse = {
@@ -70,7 +72,10 @@ export type PlayChessMoveRequest = {
 export type PlayedChessMoveResponse = {
 	playedChessMove: ChessMoveResponse;
 	currentPlayerUsername: string;
+	whitePlayerUsername: string;
+	blackPlayerUsername: string;
 	legalMovesForCurrentPlayer: ChessMoveResponse[];
+	currentPlayerInCheck: boolean;
 };
 
 export type ChessMoveResponse = {

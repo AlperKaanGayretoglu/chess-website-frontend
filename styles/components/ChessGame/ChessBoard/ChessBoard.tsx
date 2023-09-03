@@ -1,5 +1,6 @@
 import {
 	ChessColor,
+	ChessCoordinate,
 	ChessMoveResponse,
 	ChessPieceResponse,
 } from "../../../../data/api";
@@ -7,6 +8,7 @@ import {
 import { GetServerSidePropsContext } from "next";
 import ChessBoardImage from "../../../../images/chess/board/ChessBoardImage";
 import { redirectUser } from "../../../../utils/checkUser";
+import ChessPieceHighlights from "../ChessPieceHighlights/ChessPieceHighlights";
 import ChessPieces from "../ChessPieces/ChessPieces";
 import ChessShapes from "../ChessShapes/ChessShapes";
 import getChessBoardActions from "./ChessBoardActions";
@@ -16,6 +18,10 @@ const ChessBoard = ({
 	legalMoves,
 	isInGame,
 	isMyTurn,
+	isWhiteInCheck,
+	whiteKingCoordinates,
+	isBlackInCheck,
+	blackKingCoordinates,
 	playerColor,
 	sendChessMove,
 }: {
@@ -23,6 +29,10 @@ const ChessBoard = ({
 	legalMoves: ChessMoveResponse[];
 	isInGame: boolean;
 	isMyTurn: boolean;
+	isWhiteInCheck: boolean;
+	whiteKingCoordinates: ChessCoordinate;
+	isBlackInCheck: boolean;
+	blackKingCoordinates: ChessCoordinate;
 	playerColor: ChessColor;
 	sendChessMove: (chessMove: {
 		fromRow: number;
@@ -66,6 +76,15 @@ const ChessBoard = ({
 	return (
 		<div {...eventListeners}>
 			<ChessBoardImage onResize={handleResize} />
+			<ChessPieceHighlights
+				left={left}
+				top={top}
+				size={size}
+				isWhiteInCheck={isWhiteInCheck}
+				whiteKingCoordinates={whiteKingCoordinates}
+				isBlackInCheck={isBlackInCheck}
+				blackKingCoordinates={blackKingCoordinates}
+			/>
 			<ChessShapes
 				left={left}
 				top={top}

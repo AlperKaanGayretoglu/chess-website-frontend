@@ -32,7 +32,7 @@ const ChessGame = ({
 	const isInGame =
 		game?.playerBlackUsername === username ||
 		game?.playerWhiteUsername === username;
-	let playerColor = !isInGame
+	const playerColor = !isInGame
 		? null
 		: game?.playerWhiteUsername === username
 		? ChessColor.WHITE
@@ -43,24 +43,60 @@ const ChessGame = ({
 	const [board, setBoard] = useState<Map<string, ChessPieceResponse>>(
 		new Map()
 	);
-	const chessBoardUpdater = new ChessBoardUpdater(setBoard);
+	const chessBoardUpdater = new ChessBoardUpdater(board, setBoard);
 
 	const [legalMoves, setLegalMoves] = useState<ChessMoveResponse[]>([]);
+
+	const [isWhiteInCheck, setIsWhiteInCheck] = useState<boolean>(false);
+	const [isBlackInCheck, setIsBlackInCheck] = useState<boolean>(false);
+
+	// TODO: Figure out if this is necessary
+	useEffect(() => {
+		setIsWhiteInCheck(false);
+		setIsBlackInCheck(false);
+	}, []);
 
 	useEffect(() => {
 		if (game) {
 			setBoard(game?.board?.board);
 			setLegalMoves(game?.legalMovesForCurrentPlayer);
 			setIsMyTurn(game?.currentPlayerUsername === username);
+
+			if (game?.whiteInCheck) {
+				setIsWhiteInCheck(true);
+			} else {
+				setIsWhiteInCheck(false);
+			}
+
+			if (game?.blackInCheck) {
+				setIsBlackInCheck(true);
+			} else {
+				setIsBlackInCheck(false);
+			}
 		}
 	}, [game]);
 
 	// Do this when a chessMove is received
 	function getChessMoveCallback(chessMoveResponse: PlayedChessMoveResponse) {
 		handlePause();
-		const chessMoveElement = document.createElement("div");
-		chessMoveElement.innerHTML = `<p>${chessMoveResponse.currentPlayerUsername}</p>`;
 
+		setIsWhiteInCheck(false);
+		setIsBlackInCheck(false);
+
+		if (chessMoveResponse.currentPlayerInCheck) {
+			if (
+				chessMoveResponse.currentPlayerUsername ===
+				chessMoveResponse.whitePlayerUsername
+			) {
+				setIsWhiteInCheck(true);
+			}
+			if (
+				chessMoveResponse.currentPlayerUsername ===
+				chessMoveResponse.blackPlayerUsername
+			) {
+				setIsBlackInCheck(true);
+			}
+		}
 		if (chessMoveResponse.currentPlayerUsername === username) {
 			setIsMyTurn(true);
 			setLegalMoves(chessMoveResponse.legalMovesForCurrentPlayer);
@@ -77,6 +113,7 @@ const ChessGame = ({
 	}) {
 		handleReset();
 		handleStart();
+
 		const move = legalMoves.find((move) => {
 			const playedMove = move.playedPieceMove;
 			const from = playedMove.from;
@@ -93,6 +130,9 @@ const ChessGame = ({
 			showErrorToast("chess_move_error", "Invalid Chess Move");
 			return;
 		}
+
+		setIsWhiteInCheck(false);
+		setIsBlackInCheck(false);
 
 		setIsMyTurn(false);
 		chessBoardUpdater.executeChessMove(move);
@@ -117,6 +157,10 @@ const ChessGame = ({
 					isInGame={isInGame}
 					isMyTurn={isMyTurn}
 					playerColor={playerColor}
+					isWhiteInCheck={isWhiteInCheck}
+					whiteKingCoordinates={chessBoardUpdater.whiteKingCoordinates}
+					isBlackInCheck={isBlackInCheck}
+					blackKingCoordinates={chessBoardUpdater.blackKingCoordinates}
 					sendChessMove={sendChessMove}
 				/>
 			</div>

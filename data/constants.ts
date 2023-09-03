@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
 	register: API_MAIN_URL + "/auth/register",
 	login: API_MAIN_URL + "/auth/login",
 	chessGame: API_MAIN_URL + "/game",
+	chessGamePlayers: API_MAIN_URL + "/game/players",
 };
 
 export const API_WEBSOCKET_ENDPOINTS = {

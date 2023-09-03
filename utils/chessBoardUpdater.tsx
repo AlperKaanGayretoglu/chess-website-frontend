@@ -1,22 +1,74 @@
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
+	ChessColor,
+	ChessCoordinate,
 	ChessMoveResponse,
 	ChessPieceResponse,
+	ChessPieceType,
 	PieceCaptureMoveResponse,
 	PieceMoveResponse,
 	fromChessCoordinateToString,
+	fromStringToChessCoordinate,
 } from "../data/api";
 
-import { SetStateAction } from "react";
-
 export class ChessBoardUpdater {
+	private readonly board: Map<string, ChessPieceResponse>;
 	private readonly setBoard: (
 		value: SetStateAction<Map<string, ChessPieceResponse>>
 	) => void;
 
+	public readonly whiteKingCoordinates: ChessCoordinate;
+	private readonly setWhiteKingCoordinates: Dispatch<
+		SetStateAction<ChessCoordinate>
+	>;
+
+	public readonly blackKingCoordinates: ChessCoordinate;
+	private readonly setBlackKingCoordinates: Dispatch<
+		SetStateAction<ChessCoordinate>
+	>;
+
 	constructor(
+		board: Map<string, ChessPieceResponse>,
 		setBoard: (value: SetStateAction<Map<string, ChessPieceResponse>>) => void
 	) {
+		this.board = board;
 		this.setBoard = setBoard;
+
+		const [whiteKingCoordinates, setWhiteKingCoordinates] =
+			useState<ChessCoordinate>(
+				this.findKingCoordinatesForColor(ChessColor.WHITE)
+			);
+		const [blackKingCoordinates, setBlackKingCoordinates] =
+			useState<ChessCoordinate>(
+				this.findKingCoordinatesForColor(ChessColor.BLACK)
+			);
+
+		this.whiteKingCoordinates = whiteKingCoordinates;
+		this.setWhiteKingCoordinates = setWhiteKingCoordinates;
+
+		this.blackKingCoordinates = blackKingCoordinates;
+		this.setBlackKingCoordinates = setBlackKingCoordinates;
+
+		useEffect(() => {
+			this.setWhiteKingCoordinates(
+				this.findKingCoordinatesForColor(ChessColor.WHITE)
+			);
+			this.setBlackKingCoordinates(
+				this.findKingCoordinatesForColor(ChessColor.BLACK)
+			);
+		}, [board]);
+	}
+
+	private findKingCoordinatesForColor(chessColor: ChessColor) {
+		const item = Array.from(this.board?.entries()).find(([, chessPiece]) => {
+			return (
+				chessPiece.chessColor === chessColor &&
+				chessPiece.chessPieceType === ChessPieceType.KING
+			);
+		});
+		if (item) {
+			return fromStringToChessCoordinate(item[0]);
+		}
 	}
 
 	public executeChessMove(chessMoveResponse: ChessMoveResponse) {
@@ -28,6 +80,15 @@ export class ChessBoardUpdater {
 	private executePlayedPieceMove(pieceMoveResponse: PieceMoveResponse) {
 		const from = fromChessCoordinateToString(pieceMoveResponse.from);
 		const to = fromChessCoordinateToString(pieceMoveResponse.to);
+
+		const chessPiece = this.board.get(from);
+		if (chessPiece?.chessPieceType === ChessPieceType.KING) {
+			if (chessPiece?.chessColor === ChessColor.WHITE) {
+				this.setWhiteKingCoordinates(pieceMoveResponse.to);
+			} else {
+				this.setBlackKingCoordinates(pieceMoveResponse.to);
+			}
+		}
 
 		this.setBoard((board) => {
 			const newBoard = new Map(board);
