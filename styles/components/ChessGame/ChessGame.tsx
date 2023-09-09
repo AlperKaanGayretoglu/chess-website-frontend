@@ -12,6 +12,7 @@ import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
 import { ChessBoardUpdater } from "../../../utils/chessBoardUpdater";
 import { showErrorToast } from "../../../utils/promiseToast";
+import Popup from "../Popup/Popup";
 import StopWatch from "../Stopwatch/Stopwatch";
 import ChessBoard from "./ChessBoard/ChessBoard";
 
@@ -24,6 +25,9 @@ const ChessGame = ({
 }) => {
 	// TODO: Remove after testing
 	const { time, handleStart, handlePause, handleReset } = StopWatch();
+
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [popupMessage, setPopupMessage] = useState<string>("");
 
 	const chessMoveSocket = useChessMoveSocket(gameId, getChessMoveCallback).data
 		.chessMoveSocket;
@@ -103,6 +107,14 @@ const ChessGame = ({
 
 			chessBoardUpdater.executeChessMove(chessMoveResponse.playedChessMove);
 		}
+
+		if (chessMoveResponse.hasGameEnded) {
+			setIsPopupOpen(true);
+			// replace _ with space
+			setPopupMessage(
+				chessMoveResponse.chessGameStatus.toString().replace(/_/g, " ")
+			);
+		}
 	}
 
 	function sendChessMove(coordinates: {
@@ -164,6 +176,9 @@ const ChessGame = ({
 					sendChessMove={sendChessMove}
 				/>
 			</div>
+			<Popup isOpen={isPopupOpen} setIsOpen={setIsPopupOpen}>
+				<div>{popupMessage}</div>
+			</Popup>
 		</>
 	);
 };

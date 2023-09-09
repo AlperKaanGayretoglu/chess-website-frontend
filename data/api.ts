@@ -32,6 +32,8 @@ export type ChessGameResponse = {
 	legalMovesForCurrentPlayer: ChessMoveResponse[];
 	whiteInCheck: boolean;
 	blackInCheck: boolean;
+	hasGameEnded: boolean;
+	chessGameStatus: ChessGameStatus;
 };
 
 export type ChessBoardResponse = {
@@ -76,7 +78,17 @@ export type PlayedChessMoveResponse = {
 	blackPlayerUsername: string;
 	legalMovesForCurrentPlayer: ChessMoveResponse[];
 	currentPlayerInCheck: boolean;
+
+	hasGameEnded: boolean;
+	chessGameStatus: ChessGameStatus;
 };
+
+export enum ChessGameStatus {
+	ONGOING = "ONGOING",
+	WHITE_WON_BY_CHECKMATE = "WHITE_WON_BY_CHECKMATE",
+	BLACK_WON_BY_CHECKMATE = "BLACK_WON_BY_CHECKMATE",
+	DRAW_BY_STALEMATE = "DRAW_BY_STALEMATE",
+}
 
 export type ChessMoveResponse = {
 	id: string;
