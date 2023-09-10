@@ -7,6 +7,7 @@ import {
 	ChessPieceType,
 	PieceCaptureMoveResponse,
 	PieceMoveResponse,
+	PieceTransformationMoveResponse,
 	fromChessCoordinateToString,
 	fromStringToChessCoordinate,
 } from "../data/api";
@@ -75,6 +76,9 @@ export class ChessBoardUpdater {
 		this.executePieceCaptureMoves(chessMoveResponse.pieceCaptureMoves);
 		this.executeTriggeredPieceMoves(chessMoveResponse.triggeredPieceMoves);
 		this.executePlayedPieceMove(chessMoveResponse.playedPieceMove);
+		this.executePieceTransformationMove(
+			chessMoveResponse.pieceTransformationMove
+		);
 	}
 
 	private executePlayedPieceMove(pieceMoveResponse: PieceMoveResponse) {
@@ -115,5 +119,27 @@ export class ChessBoardUpdater {
 				return newBoard;
 			});
 		});
+	}
+
+	private executePieceTransformationMove(
+		pieceTransformationMove: PieceTransformationMoveResponse | null
+	) {
+		if (pieceTransformationMove) {
+			const at = fromChessCoordinateToString(pieceTransformationMove.at);
+			const toPiece = pieceTransformationMove.transformTo;
+
+			this.setBoard((board) => {
+				const newBoard = new Map(board);
+				const chessPiece = newBoard.get(at);
+				if (chessPiece) {
+					newBoard.delete(at);
+					newBoard.set(at, {
+						chessColor: toPiece.chessColor,
+						chessPieceType: toPiece.chessPieceType,
+					});
+				}
+				return newBoard;
+			});
+		}
 	}
 }

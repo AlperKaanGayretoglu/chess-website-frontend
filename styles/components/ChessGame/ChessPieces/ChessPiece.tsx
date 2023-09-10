@@ -16,8 +16,8 @@ const ChessPiece = ({
 	pixelCoordinates: {
 		x: number;
 		y: number;
-	};
-	size: number;
+	} | null;
+	size: number | string;
 	isGhostLike?: boolean;
 }) => {
 	const color = chessColor?.charAt(0).toLowerCase();
@@ -28,9 +28,9 @@ const ChessPiece = ({
 	return (
 		<div
 			style={{
-				position: "absolute",
-				top: pixelCoordinates.y,
-				left: pixelCoordinates.x,
+				position: pixelCoordinates ? "absolute" : "relative",
+				top: pixelCoordinates ? pixelCoordinates.y : 0,
+				left: pixelCoordinates ? pixelCoordinates.x : 0,
 				width: size,
 				height: size,
 				cursor: "pointer",

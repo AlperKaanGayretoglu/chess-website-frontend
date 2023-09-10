@@ -2,7 +2,6 @@ import {
 	ChessColor,
 	ChessCoordinate,
 	ChessMoveResponse,
-	ChessMoveType,
 	ChessPieceResponse,
 	ChessPieceType,
 	fromChessCoordinateToString,
@@ -295,16 +294,26 @@ export default function getChessBoardActions(
 			const to = playedMove.to;
 
 			if (from.row === row && from.column === column) {
-				if (move.moveType === ChessMoveType.NORMAL_PIECE_CAPTURE) {
-					setSemiSquareShapes((shapes) => [
-						...shapes,
-						{ row: to.row, column: to.column },
-					]);
+				if (move.pieceCaptureMoves.length > 0) {
+					setSemiSquareShapes((shapes) => {
+						const alreadyExists = shapes.some(
+							(shape) => shape.row === to.row && shape.column === to.column
+						);
+						if (alreadyExists) {
+							return shapes;
+						}
+						return [...shapes, { row: to.row, column: to.column }];
+					});
 				} else {
-					setPointShapes((shapes) => [
-						...shapes,
-						{ row: to.row, column: to.column },
-					]);
+					setPointShapes((shapes) => {
+						const alreadyExists = shapes.some(
+							(shape) => shape.row === to.row && shape.column === to.column
+						);
+						if (alreadyExists) {
+							return shapes;
+						}
+						return [...shapes, { row: to.row, column: to.column }];
+					});
 				}
 			}
 		});

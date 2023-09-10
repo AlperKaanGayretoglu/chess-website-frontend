@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
 	ChessColor,
+	ChessGameStatus,
 	ChessMoveResponse,
 	ChessPieceResponse,
 	PlayedChessMoveResponse,
@@ -15,6 +16,7 @@ import { showErrorToast } from "../../../utils/promiseToast";
 import Popup from "../Popup/Popup";
 import StopWatch from "../Stopwatch/Stopwatch";
 import ChessBoard from "./ChessBoard/ChessBoard";
+import ChessPiece from "./ChessPieces/ChessPiece";
 
 const ChessGame = ({
 	gameId,
@@ -26,8 +28,14 @@ const ChessGame = ({
 	// TODO: Remove after testing
 	const { time, handleStart, handlePause, handleReset } = StopWatch();
 
-	const [isPopupOpen, setIsPopupOpen] = useState(false);
-	const [popupMessage, setPopupMessage] = useState<string>("");
+	const [isEndgamePopupOpen, setIsEndgamePopupOpen] = useState(false);
+	const [endgamePopupMessage, setEndgamePopupMessage] = useState<string>("");
+
+	const [isPawnPromotionPopupOpen, setIsPawnPromotionPopupOpen] =
+		useState(false);
+	const [pawnPromotionPopupMoves, setPawnPromotionPopupMoves] = useState<
+		ChessMoveResponse[]
+	>([]);
 
 	const chessMoveSocket = useChessMoveSocket(gameId, getChessMoveCallback).data
 		.chessMoveSocket;
@@ -77,6 +85,13 @@ const ChessGame = ({
 			} else {
 				setIsBlackInCheck(false);
 			}
+
+			if (game?.chessGameStatus !== ChessGameStatus.ONGOING) {
+				setIsEndgamePopupOpen(true);
+				setEndgamePopupMessage(
+					game?.chessGameStatus.toString().replace(/_/g, " ")
+				);
+			}
 		}
 	}, [game]);
 
@@ -109,9 +124,8 @@ const ChessGame = ({
 		}
 
 		if (chessMoveResponse.hasGameEnded) {
-			setIsPopupOpen(true);
-			// replace _ with space
-			setPopupMessage(
+			setIsEndgamePopupOpen(true);
+			setEndgamePopupMessage(
 				chessMoveResponse.chessGameStatus.toString().replace(/_/g, " ")
 			);
 		}
@@ -126,7 +140,7 @@ const ChessGame = ({
 		handleReset();
 		handleStart();
 
-		const move = legalMoves.find((move) => {
+		const moves = legalMoves.filter((move) => {
 			const playedMove = move.playedPieceMove;
 			const from = playedMove.from;
 			const to = playedMove.to;
@@ -138,20 +152,32 @@ const ChessGame = ({
 			);
 		});
 
-		if (!move) {
+		if (moves.length === 0) {
 			showErrorToast("chess_move_error", "Invalid Chess Move");
 			return;
 		}
 
+		if (moves.length == 1) {
+			processChessMoveThatIsConfirmedValid(moves[0]);
+		} else {
+			setPawnPromotionPopupMoves(moves);
+			setIsPawnPromotionPopupOpen(true);
+		}
+	}
+
+	function processChessMoveThatIsConfirmedValid(chessMove: ChessMoveResponse) {
 		setIsWhiteInCheck(false);
 		setIsBlackInCheck(false);
 
 		setIsMyTurn(false);
-		chessBoardUpdater.executeChessMove(move);
+		chessBoardUpdater.executeChessMove(chessMove);
+
+		setIsPawnPromotionPopupOpen(false);
+		setPawnPromotionPopupMoves([]);
 
 		chessMoveSocket.sendMessage({
 			username: username as string,
-			chessMoveId: move.id,
+			chessMoveId: chessMove.id,
 		});
 	}
 
@@ -176,8 +202,64 @@ const ChessGame = ({
 					sendChessMove={sendChessMove}
 				/>
 			</div>
-			<Popup isOpen={isPopupOpen} setIsOpen={setIsPopupOpen}>
-				<div>{popupMessage}</div>
+			<Popup isOpen={isEndgamePopupOpen} setIsOpen={setIsEndgamePopupOpen}>
+				<div
+					style={{
+						padding: "3em",
+					}}
+				>
+					{endgamePopupMessage}
+				</div>
+			</Popup>
+			<Popup
+				isOpen={isPawnPromotionPopupOpen}
+				setIsOpen={setIsPawnPromotionPopupOpen}
+			>
+				<div
+					style={{
+						padding: "1em",
+						display: "flex",
+						flexWrap: "wrap",
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					{pawnPromotionPopupMoves
+						.sort(
+							(a, b) =>
+								a.pieceTransformationMove.transformTo.chessPieceType
+									.toString()
+									.charCodeAt(0) -
+								b.pieceTransformationMove.transformTo.chessPieceType
+									.toString()
+									.charCodeAt(0)
+						)
+						.map((move, index) => {
+							const piece = move.pieceTransformationMove.transformTo;
+							const size = "5em";
+
+							return (
+								<div
+									onClick={() => processChessMoveThatIsConfirmedValid(move)}
+									key={index}
+									style={{
+										margin: "1em",
+										display: "flex",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+								>
+									<ChessPiece
+										key={index}
+										chessColor={piece.chessColor}
+										chessPieceType={piece.chessPieceType}
+										size={size}
+										pixelCoordinates={null}
+									/>
+								</div>
+							);
+						})}
+				</div>
 			</Popup>
 		</>
 	);
