@@ -65,6 +65,12 @@ const ChessGame = ({
 	useEffect(() => {
 		setIsWhiteInCheck(false);
 		setIsBlackInCheck(false);
+
+		setIsEndgamePopupOpen(false);
+		setEndgamePopupMessage("");
+
+		setIsPawnPromotionPopupOpen(false);
+		setPawnPromotionPopupMoves([]);
 	}, []);
 
 	useEffect(() => {
@@ -90,6 +96,9 @@ const ChessGame = ({
 				setEndgamePopupMessage(
 					game?.chessGameStatus.toString().replace(/_/g, " ")
 				);
+			} else {
+				setIsEndgamePopupOpen(false);
+				setEndgamePopupMessage("");
 			}
 		}
 	}, [game]);
