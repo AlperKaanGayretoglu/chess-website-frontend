@@ -9,6 +9,14 @@ export const GeneralBase = styled.div`
 	flex-direction: column;
 `;
 
+export const GeneralBaseRowDirection = styled.div`
+	display: flex;
+	background-color: ${GLOBAL_THEME_VALUES.background.main};
+	height: 100%;
+	min-height: 100vh;
+	flex-direction: row;
+`;
+
 export const Main = styled.main`
 	display: flex;
 	align-items: stretch;

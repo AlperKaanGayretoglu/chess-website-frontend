@@ -5,6 +5,7 @@ import {
 	HeaderText,
 	TextLogo,
 } from "./Header.style";
+import { HeaderOnLeftBase, HeaderOnLeftContainer } from "./HeaderOnLeft.style";
 
 import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
@@ -14,7 +15,7 @@ import { checkIsLoggedIn } from "../../../utils/checkUser";
 import { promiseToast } from "../../../utils/promiseToast";
 import { SecondaryButton } from "../Button/Button";
 
-const Header = () => {
+const Header = ({ isOnLeft = false }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>();
 
 	useEffect(() => {
@@ -38,7 +39,19 @@ const Header = () => {
 		}
 	};
 
-	return (
+	return isOnLeft ? (
+		<HeaderOnLeftBase>
+			<HeaderOnLeftContainer>
+				<TextLogo onClick={() => router.push("/")}>Chess Website</TextLogo>
+			</HeaderOnLeftContainer>
+			{isLoggedIn && (
+				<>
+					<HeaderText>{username}</HeaderText>
+					<SecondaryButton onClick={handleLogout}>Logout</SecondaryButton>
+				</>
+			)}
+		</HeaderOnLeftBase>
+	) : (
 		<HeaderBase>
 			<HeaderContainer>
 				<TextLogo onClick={() => router.push("/")}>Chess Website</TextLogo>

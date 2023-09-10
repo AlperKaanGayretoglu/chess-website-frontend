@@ -24,8 +24,10 @@ export default function ChessBoardImage({ onResize }) {
 		};
 	}, [onResize]);
 
+	const pixelSize = "750px";
+
 	return (
-		<div ref={elementRef} style={{ width: "700px", height: "700px" }}>
+		<div ref={elementRef} style={{ width: pixelSize, height: pixelSize }}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				xmlnsXlink="http://www.w3.org/1999/xlink"

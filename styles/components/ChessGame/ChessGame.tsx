@@ -12,6 +12,7 @@ import useChessMoveSocket from "../../../data/useChessMoveSocket";
 import { redirectUser } from "../../../utils/checkUser";
 import { ChessBoardUpdater } from "../../../utils/chessBoardUpdater";
 import { showErrorToast } from "../../../utils/promiseToast";
+import PlayerNamePlate from "../PlayerNamePlate/PlayerNamePlate";
 import Popup from "../Popup/Popup";
 import StopWatch from "../Stopwatch/Stopwatch";
 import ChessBoard from "./ChessBoard/ChessBoard";
@@ -198,12 +199,26 @@ const ChessGame = ({
 	}
 
 	return (
-		<>
-			<div>
-				<span>{Math.floor((time / 1000) % 60)}.</span>
-				<span>{("0" + ((time / 10) % 100)).slice(-2)}</span>
-			</div>
+		<div
+			style={{
+				height: "100%",
+				display: "flex",
+				flexDirection: "column",
+				justifyContent: "center",
+				alignItems: "center",
+			}}
+		>
 			<br></br>
+			<PlayerNamePlate
+				playerName={
+					playerColor === null
+						? game?.playerBlackUsername
+						: playerColor === ChessColor.WHITE
+						? game?.playerBlackUsername
+						: game?.playerWhiteUsername
+				}
+				isMyMove={!isMyTurn}
+			/>
 			<div>
 				<ChessBoard
 					board={board}
@@ -218,6 +233,16 @@ const ChessGame = ({
 					sendChessMove={sendChessMove}
 				/>
 			</div>
+			<PlayerNamePlate
+				playerName={playerColor === null ? game?.playerWhiteUsername : username}
+				isMyMove={isMyTurn}
+			/>
+
+			<div>
+				<span>{Math.floor((time / 1000) % 60)}.</span>
+				<span>{("0" + ((time / 10) % 100)).slice(-2)}</span>
+			</div>
+
 			<Popup isOpen={isEndgamePopupOpen} setIsOpen={setIsEndgamePopupOpen}>
 				<div
 					style={{
@@ -277,7 +302,7 @@ const ChessGame = ({
 						})}
 				</div>
 			</Popup>
-		</>
+		</div>
 	);
 };
 

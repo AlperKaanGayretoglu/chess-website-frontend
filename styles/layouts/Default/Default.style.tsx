@@ -15,6 +15,16 @@ export const DefaultContainer = styled.div`
 	padding: 96px 48px 48px; // TODO: Fix this
 `;
 
+export const RowDirectionContainer = styled.div`
+	width: 80%;
+	height: 100%;
+	max-width: 1440px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+`;
+
 export const ButtonContainer = styled.div`
 	display: flex;
 	justify-content: center;

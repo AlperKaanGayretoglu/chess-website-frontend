@@ -1,6 +1,6 @@
 import {
 	DefaultBase,
-	DefaultContainer,
+	RowDirectionContainer,
 } from "../../styles/layouts/Default/Default.style";
 
 import { getCookie } from "cookies-next";
@@ -18,11 +18,11 @@ export default function Home() {
 	const username = getCookie(COOKIE_NAMES.username) as string;
 
 	return (
-		<General>
+		<General isHeaderOnLeft={true}>
 			<DefaultBase>
-				<DefaultContainer>
+				<RowDirectionContainer>
 					<ChessGame gameId={gameId} username={username} />
-				</DefaultContainer>
+				</RowDirectionContainer>
 			</DefaultBase>
 		</General>
 	);
