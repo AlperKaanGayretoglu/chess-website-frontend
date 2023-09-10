@@ -239,7 +239,10 @@ export default function getChessBoardActions(
 		const row = Math.floor((y - top) / (size / 8));
 		const column = Math.floor((x - left) / (size / 8));
 
-		return { row, column };
+		return {
+			row: playerColor === ChessColor.WHITE ? row : 7 - row,
+			column: playerColor === ChessColor.WHITE ? column : 7 - column,
+		};
 	}
 
 	function createGhostPieceUsing(

@@ -1,5 +1,6 @@
+import { ChessColor, ChessCoordinate } from "../../../../data/api";
+
 import { GetServerSidePropsContext } from "next";
-import { ChessCoordinate } from "../../../../data/api";
 import { redirectUser } from "../../../../utils/checkUser";
 import ChessPieceHighlight from "./ChessPieceHighlight";
 
@@ -11,6 +12,7 @@ const ChessPieceHighlights = ({
 	whiteKingCoordinates,
 	isBlackInCheck,
 	blackKingCoordinates,
+	whichPlayerColorPov,
 }: {
 	left: number;
 	top: number;
@@ -19,24 +21,32 @@ const ChessPieceHighlights = ({
 	whiteKingCoordinates: ChessCoordinate;
 	isBlackInCheck: boolean;
 	blackKingCoordinates: ChessCoordinate;
+	whichPlayerColorPov: ChessColor;
 }) => {
+	function calculateXandY(coordinates: ChessCoordinate) {
+		return {
+			x:
+				whichPlayerColorPov === ChessColor.WHITE
+					? left + coordinates.column * (size / 8)
+					: left + (7 - coordinates.column) * (size / 8),
+			y:
+				whichPlayerColorPov === ChessColor.WHITE
+					? top + coordinates.row * (size / 8)
+					: top + (7 - coordinates.row) * (size / 8),
+		};
+	}
+
 	return (
 		<div>
 			{isWhiteInCheck && whiteKingCoordinates && (
 				<ChessPieceHighlight
-					pixelCoordinates={{
-						x: left + whiteKingCoordinates.column * (size / 8),
-						y: top + whiteKingCoordinates.row * (size / 8),
-					}}
+					pixelCoordinates={calculateXandY(whiteKingCoordinates)}
 					size={size / 8}
 				/>
 			)}
 			{isBlackInCheck && blackKingCoordinates && (
 				<ChessPieceHighlight
-					pixelCoordinates={{
-						x: left + blackKingCoordinates.column * (size / 8),
-						y: top + blackKingCoordinates.row * (size / 8),
-					}}
+					pixelCoordinates={calculateXandY(blackKingCoordinates)}
 					size={size / 8}
 				/>
 			)}

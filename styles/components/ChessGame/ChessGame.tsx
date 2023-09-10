@@ -115,10 +115,18 @@ const ChessGame = ({
 				setIsBlackInCheck(true);
 			}
 		}
-		if (chessMoveResponse.currentPlayerUsername === username) {
+
+		const isMyTurn = chessMoveResponse.currentPlayerUsername === username;
+		const isInGame =
+			chessMoveResponse.whitePlayerUsername === username ||
+			chessMoveResponse.blackPlayerUsername === username;
+
+		if (isMyTurn) {
 			setIsMyTurn(true);
 			setLegalMoves(chessMoveResponse.legalMovesForCurrentPlayer);
+		}
 
+		if (isMyTurn || !isInGame) {
 			chessBoardUpdater.executeChessMove(chessMoveResponse.playedChessMove);
 		}
 
@@ -193,7 +201,7 @@ const ChessGame = ({
 					legalMoves={legalMoves}
 					isInGame={isInGame}
 					isMyTurn={isMyTurn}
-					playerColor={playerColor}
+					playerColor={playerColor === null ? ChessColor.WHITE : playerColor}
 					isWhiteInCheck={isWhiteInCheck}
 					whiteKingCoordinates={chessBoardUpdater.whiteKingCoordinates}
 					isBlackInCheck={isBlackInCheck}

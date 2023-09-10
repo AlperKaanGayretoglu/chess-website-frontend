@@ -84,6 +84,7 @@ const ChessBoard = ({
 				whiteKingCoordinates={whiteKingCoordinates}
 				isBlackInCheck={isBlackInCheck}
 				blackKingCoordinates={blackKingCoordinates}
+				whichPlayerColorPov={playerColor}
 			/>
 			<ChessShapes
 				left={left}
@@ -94,6 +95,7 @@ const ChessBoard = ({
 				semiSquareShapes={semiSquareShapes}
 				ghostSquareShapes={ghostSquareShapes}
 				ghostPiece={ghostPiece}
+				whichPlayerColorPov={playerColor}
 			/>
 			<ChessPieces
 				left={left}
@@ -101,6 +103,7 @@ const ChessBoard = ({
 				size={size}
 				board={board}
 				ghostLikePiece={ghostLikePiece}
+				whichPlayerColorPov={playerColor}
 			/>
 		</div>
 	);

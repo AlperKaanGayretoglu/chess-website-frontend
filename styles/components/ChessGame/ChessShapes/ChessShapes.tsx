@@ -20,6 +20,7 @@ const ChessShapes = ({
 	semiSquareShapes,
 	ghostSquareShapes,
 	ghostPiece,
+	whichPlayerColorPov = ChessColor.WHITE,
 }: {
 	left: number;
 	top: number;
@@ -34,6 +35,7 @@ const ChessShapes = ({
 		chessColor: ChessColor;
 		chessPieceType: ChessPieceType;
 	};
+	whichPlayerColorPov?: ChessColor;
 }) => {
 	// TODO: If you decide there can only be 1 ghost square shape, then just retrive it instead of using an array
 	const ghostSquareShape = ghostSquareShapes[0];
@@ -49,16 +51,27 @@ const ChessShapes = ({
 			coordinates.column === ghostSquareShape.column
 		);
 	}
+
+	function calculateXandY(coordinates: ChessCoordinate) {
+		return {
+			x:
+				whichPlayerColorPov === ChessColor.WHITE
+					? left + coordinates.column * (size / 8)
+					: left + (7 - coordinates.column) * (size / 8),
+			y:
+				whichPlayerColorPov === ChessColor.WHITE
+					? top + coordinates.row * (size / 8)
+					: top + (7 - coordinates.row) * (size / 8),
+		};
+	}
+
 	return (
 		<div>
 			{squareShapes.map((shape: ChessCoordinate, index: number) => {
 				return (
 					<SquareShape
 						key={index}
-						pixelCoordinates={{
-							x: left + shape.column * (size / 8),
-							y: top + shape.row * (size / 8),
-						}}
+						pixelCoordinates={calculateXandY(shape)}
 						size={size / 8}
 					/>
 				);
@@ -71,10 +84,7 @@ const ChessShapes = ({
 				return (
 					<SemiSquareShape
 						key={index}
-						pixelCoordinates={{
-							x: left + shape.column * (size / 8),
-							y: top + shape.row * (size / 8),
-						}}
+						pixelCoordinates={calculateXandY(shape)}
 						size={size / 8}
 					/>
 				);
@@ -87,10 +97,7 @@ const ChessShapes = ({
 				return (
 					<PointShape
 						key={index}
-						pixelCoordinates={{
-							x: left + shape.column * (size / 8),
-							y: top + shape.row * (size / 8),
-						}}
+						pixelCoordinates={calculateXandY(shape)}
 						size={size / 8}
 					/>
 				);
@@ -99,10 +106,7 @@ const ChessShapes = ({
 				return (
 					<SquareShape
 						key={index}
-						pixelCoordinates={{
-							x: left + shape.column * (size / 8),
-							y: top + shape.row * (size / 8),
-						}}
+						pixelCoordinates={calculateXandY(shape)}
 						size={size / 8}
 						isLight={true}
 					/>
