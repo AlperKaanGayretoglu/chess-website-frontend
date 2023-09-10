@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
 	ChessColor,
-	ChessGameStatus,
 	ChessMoveResponse,
 	ChessPieceResponse,
 	PlayedChessMoveResponse,
@@ -86,7 +85,7 @@ const ChessGame = ({
 				setIsBlackInCheck(false);
 			}
 
-			if (game?.chessGameStatus !== ChessGameStatus.ONGOING) {
+			if (game?.hasGameEnded) {
 				setIsEndgamePopupOpen(true);
 				setEndgamePopupMessage(
 					game?.chessGameStatus.toString().replace(/_/g, " ")
