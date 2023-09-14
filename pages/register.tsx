@@ -39,16 +39,16 @@ const Register = () => {
 		formState: { errors },
 		control,
 	} = useForm<{
-		username: string;
-		email: string;
-		password: string;
+		username?: string;
+		email?: string;
+		password?: string;
 	}>({
 		resolver: yupResolver(
 			yup.object({
 				username: usernameValidation,
 				email: emailValidation,
 				password: passwordValidation,
-			})
+			} as any)
 		),
 		reValidateMode: "onSubmit",
 	});

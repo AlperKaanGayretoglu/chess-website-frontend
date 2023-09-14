@@ -37,14 +37,14 @@ const Login = () => {
 		formState: { errors },
 		control,
 	} = useForm<{
-		username: string;
-		password: string;
+		username?: string;
+		password?: string;
 	}>({
 		resolver: yupResolver(
 			yup.object({
 				username: usernameValidation,
 				password: passwordValidation,
-			})
+			} as any)
 		),
 		reValidateMode: "onSubmit",
 	});
