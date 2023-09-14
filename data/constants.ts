@@ -9,7 +9,7 @@ export const COOKIE_NAMES = {
 
 export const ADMIN_ONLY_PAGES = [];
 
-export const API_MAIN_URL = "http://localhost:8080";
+export const API_MAIN_URL = process.env.NEXT_PUBLIC_API_MAIN_URL;
 
 export const API_ENDPOINTS = {
 	register: API_MAIN_URL + "/auth/register",
