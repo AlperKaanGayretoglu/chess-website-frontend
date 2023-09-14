@@ -66,7 +66,7 @@ export type CreateChessGameRequest = {
 	secondPlayerUsername: string;
 };
 
-// ----------------------------------------- ChessGameSocketController -----------------------------------------
+// ---------------------------------------- ChessGameSocketController ----------------------------------------
 export type PlayChessMoveRequest = {
 	username: string;
 	chessMoveId: string;
