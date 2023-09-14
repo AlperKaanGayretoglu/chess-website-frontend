@@ -20,7 +20,6 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { LoginForm } from "../data/api";
 import { login } from "../services/authenticationApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import PasswordInput from "../styles/components/Input/PasswordInput";
@@ -37,7 +36,10 @@ const Login = () => {
 		handleSubmit,
 		formState: { errors },
 		control,
-	} = useForm<LoginForm>({
+	} = useForm<{
+		username: string;
+		password: string;
+	}>({
 		resolver: yupResolver(
 			yup.object({
 				username: usernameValidation,

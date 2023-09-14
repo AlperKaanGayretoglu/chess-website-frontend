@@ -21,7 +21,6 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { RegisterForm } from "../data/api";
 import { register } from "../services/authenticationApi";
 import { PrimaryButton } from "../styles/components/Button/Button";
 import MailInput from "../styles/components/Input/MailInput";
@@ -39,7 +38,11 @@ const Register = () => {
 		handleSubmit,
 		formState: { errors },
 		control,
-	} = useForm<RegisterForm>({
+	} = useForm<{
+		username: string;
+		email: string;
+		password: string;
+	}>({
 		resolver: yupResolver(
 			yup.object({
 				username: usernameValidation,
