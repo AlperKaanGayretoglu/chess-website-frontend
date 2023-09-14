@@ -11,6 +11,9 @@ export default function DefaultProfilePhoto({ shouldHaveOutline = false }) {
 					? `${size * 0.15}px solid #00d300`
 					: `${size * 0.15}px solid #503e3e`,
 				background: "white",
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
 			}}
 		>
 			<DefaultPhoto

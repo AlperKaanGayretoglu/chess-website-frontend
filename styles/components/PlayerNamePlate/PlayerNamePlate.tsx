@@ -2,10 +2,10 @@ import DefaultProfilePhoto from "../../../images/default_profile_photo/DefaultPr
 
 const PlayerNamePlate = ({
 	playerName,
-	isMyMove,
+	shouldHaveOutline: shouldHaveOutline,
 }: {
 	playerName: string;
-	isMyMove: boolean;
+	shouldHaveOutline: boolean;
 }) => {
 	return (
 		<div
@@ -16,9 +16,11 @@ const PlayerNamePlate = ({
 				border: "5px solid black",
 				padding: "0.25em",
 				width: "100%",
+				// disable user select:
+				userSelect: "none",
 			}}
 		>
-			<DefaultProfilePhoto shouldHaveOutline={isMyMove} />
+			<DefaultProfilePhoto shouldHaveOutline={shouldHaveOutline} />
 			<span
 				style={{
 					marginLeft: "0.5em",

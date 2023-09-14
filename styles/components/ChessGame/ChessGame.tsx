@@ -30,6 +30,7 @@ const ChessGame = ({
 
 	const [isEndgamePopupOpen, setIsEndgamePopupOpen] = useState(false);
 	const [endgamePopupMessage, setEndgamePopupMessage] = useState<string>("");
+	const [winnerUsername, setWinnerUsername] = useState<string>(null);
 
 	const [isPawnPromotionPopupOpen, setIsPawnPromotionPopupOpen] =
 		useState(false);
@@ -69,6 +70,7 @@ const ChessGame = ({
 
 		setIsEndgamePopupOpen(false);
 		setEndgamePopupMessage("");
+		setWinnerUsername("");
 
 		setIsPawnPromotionPopupOpen(false);
 		setPawnPromotionPopupMoves([]);
@@ -97,9 +99,11 @@ const ChessGame = ({
 				setEndgamePopupMessage(
 					game?.chessGameStatus.toString().replace(/_/g, " ")
 				);
+				setWinnerUsername(game?.winnerUsername);
 			} else {
 				setIsEndgamePopupOpen(false);
 				setEndgamePopupMessage("");
+				setWinnerUsername("");
 			}
 		}
 	}, [game]);
@@ -145,6 +149,7 @@ const ChessGame = ({
 			setEndgamePopupMessage(
 				chessMoveResponse.chessGameStatus.toString().replace(/_/g, " ")
 			);
+			setWinnerUsername(chessMoveResponse.winnerUsername);
 		}
 	}
 
@@ -217,7 +222,7 @@ const ChessGame = ({
 						? game?.playerBlackUsername
 						: game?.playerWhiteUsername
 				}
-				isMyMove={!isMyTurn}
+				shouldHaveOutline={!isMyTurn}
 			/>
 			<div>
 				<ChessBoard
@@ -235,7 +240,7 @@ const ChessGame = ({
 			</div>
 			<PlayerNamePlate
 				playerName={playerColor === null ? game?.playerWhiteUsername : username}
-				isMyMove={isMyTurn}
+				shouldHaveOutline={isMyTurn}
 			/>
 
 			<div>
@@ -247,9 +252,115 @@ const ChessGame = ({
 				<div
 					style={{
 						padding: "3em",
+						fontSize: "1.5em",
+						fontWeight: "bold",
+						color: "white",
 					}}
 				>
-					{endgamePopupMessage}
+					{winnerUsername ? (
+						<div
+							style={{
+								display: "flex",
+								justifyContent: "center",
+								alignItems: "center",
+								flexDirection: "column",
+							}}
+						>
+							<div
+								style={{
+									fontSize: "2em",
+								}}
+							>
+								{winnerUsername === username
+									? "You Won!"
+									: isInGame
+									? "You Lost!"
+									: winnerUsername === game?.playerWhiteUsername
+									? "White Won!"
+									: "Black Won!"}
+							</div>
+							<br />
+							<div
+								style={{
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								<PlayerNamePlate
+									playerName={game?.playerWhiteUsername}
+									shouldHaveOutline={
+										game?.playerWhiteUsername === winnerUsername
+									}
+								/>
+								<span
+									style={{
+										margin: "0 1em",
+									}}
+								>
+									{" "}
+									vs{" "}
+								</span>
+								<PlayerNamePlate
+									playerName={game?.playerBlackUsername}
+									shouldHaveOutline={
+										game?.playerBlackUsername === winnerUsername
+									}
+								/>
+							</div>
+						</div>
+					) : (
+						<div
+							style={{
+								display: "flex",
+								justifyContent: "center",
+								alignItems: "center",
+								flexDirection: "column",
+							}}
+						>
+							<div
+								style={{
+									fontSize: "2em",
+									textAlign: "center",
+								}}
+							>
+								DRAW!
+							</div>
+							<br />
+							<div
+								style={{
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								<PlayerNamePlate
+									playerName={game?.playerWhiteUsername}
+									shouldHaveOutline={false}
+								/>
+								<span
+									style={{
+										margin: "0 1em",
+									}}
+								>
+									{" "}
+									vs{" "}
+								</span>
+								<PlayerNamePlate
+									playerName={game?.playerBlackUsername}
+									shouldHaveOutline={false}
+								/>
+							</div>
+						</div>
+					)}
+					<br />
+					<div
+						style={{
+							textAlign: "center",
+						}}
+					>
+						{endgamePopupMessage}
+					</div>
 				</div>
 			</Popup>
 			<Popup

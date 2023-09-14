@@ -34,6 +34,7 @@ export type ChessGameResponse = {
 	blackInCheck: boolean;
 	hasGameEnded: boolean;
 	chessGameStatus: ChessGameStatus;
+	winnerUsername: string | null;
 };
 
 export type ChessBoardResponse = {
@@ -81,6 +82,7 @@ export type PlayedChessMoveResponse = {
 
 	hasGameEnded: boolean;
 	chessGameStatus: ChessGameStatus;
+	winnerUsername: string | null;
 };
 
 export enum ChessGameStatus {
