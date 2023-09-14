@@ -63,8 +63,8 @@ export class ChessBoardUpdater {
 	private findKingCoordinatesForColor(chessColor: ChessColor) {
 		const item = Array.from(this.board?.entries()).find(([, chessPiece]) => {
 			return (
-				chessPiece.chessColor === chessColor &&
-				chessPiece.chessPieceType === ChessPieceType.KING
+				chessPiece?.chessColor === chessColor &&
+				chessPiece?.chessPieceType === ChessPieceType.KING
 			);
 		});
 		if (item) {
